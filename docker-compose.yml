@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: amadeostore-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: amadeo-store
+      POSTGRES_USER: amadeostore
+      POSTGRES_PASSWORD: Amadeo123
+    ports:
+      - '5439:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - amadeostore-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: amadeostore-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@amadeostore.com
+      PGADMIN_DEFAULT_PASSWORD: Amadeo2026!
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres
+    networks:
+      - amadeostore-network
+
+  app:
+    build: .
+    container_name: amadeostore-app
+    restart: unless-stopped
+    ports:
+      - '5173:5173'
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://amadeostore:Amadeo123@postgres:5432/amadeo-store
+    networks:
+      - amadeostore-network
+    command: sh -c "npm install && npm run dev -- --host"
+
+volumes:
+  postgres_data:
+
+networks:
+  amadeostore-network:
+    driver: bridge
