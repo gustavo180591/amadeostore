@@ -49,7 +49,7 @@ async function main() {
 				id: 'sample-phone-1',
 				name: 'iPhone 15 Pro',
 				description: 'El último iPhone con chip A17 Pro',
-				price: 1200.00,
+				price: 1200.0,
 				stock: 10,
 				isActive: true,
 				categoryId: smartphone.id
@@ -65,7 +65,7 @@ async function main() {
 				id: 'sample-laptop-1',
 				name: 'MacBook Pro 14"',
 				description: 'Laptop profesional con chip M3',
-				price: 2500.00,
+				price: 2500.0,
 				stock: 5,
 				isActive: true,
 				categoryId: laptops.id
