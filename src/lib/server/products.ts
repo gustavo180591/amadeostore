@@ -18,9 +18,9 @@ export async function getProducts() {
 
 export async function getProductById(id: string) {
 	const product = await prisma.product.findUnique({
-		where: { 
+		where: {
 			id,
-			isActive: true 
+			isActive: true
 		},
 		include: {
 			category: true
@@ -32,9 +32,9 @@ export async function getProductById(id: string) {
 
 export async function getProductsByCategory(categoryId: string) {
 	const products = await prisma.product.findMany({
-		where: { 
+		where: {
 			categoryId,
-			isActive: true 
+			isActive: true
 		},
 		include: {
 			category: true

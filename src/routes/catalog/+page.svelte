@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getProducts, getCategories } from '$lib/server/products';
+	import { goto } from '$app/navigation';
 	import type { Product, Category } from '@prisma/client';
 
 	let data = $props<{
@@ -11,7 +11,9 @@
 
 	let filteredProducts = $derived(() => {
 		if (selectedCategory) {
-			return data.products.filter((p: Product & { category: Category | null }) => p.categoryId === selectedCategory);
+			return data.products.filter(
+				(p: Product & { category: Category | null }) => p.categoryId === selectedCategory
+			);
 		} else {
 			return data.products;
 		}
@@ -26,9 +28,9 @@
 </script>
 
 <div class="min-h-screen bg-gray-50">
-	<div class="max-w-7xl mx-auto px-4 py-8">
+	<div class="mx-auto max-w-7xl px-4 py-8">
 		<header class="mb-8">
-			<h1 class="text-3xl font-bold text-gray-900 mb-2">Catálogo de Productos</h1>
+			<h1 class="mb-2 text-3xl font-bold text-gray-900">Catálogo de Productos</h1>
 			<p class="text-gray-600">Descubre nuestra selección de productos</p>
 		</header>
 
@@ -36,7 +38,7 @@
 		<div class="mb-8">
 			<div class="flex flex-wrap gap-2">
 				<button
-					class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+					class="rounded-full px-4 py-2 text-sm font-medium transition-colors"
 					class:bg-blue-600={selectedCategory === null}
 					class:text-white={selectedCategory === null}
 					class:bg-gray-200={selectedCategory !== null}
@@ -46,9 +48,9 @@
 				>
 					Todos
 				</button>
-				{#each data.categories as category}
+				{#each data.categories as category (category.id)}
 					<button
-						class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+						class="rounded-full px-4 py-2 text-sm font-medium transition-colors"
 						class:bg-blue-600={selectedCategory === category.id}
 						class:text-white={selectedCategory === category.id}
 						class:bg-gray-200={selectedCategory !== category.id}
@@ -63,54 +65,57 @@
 		</div>
 
 		<!-- Products Grid -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-			{#each filteredProducts() as product}
-				<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+			{#each filteredProducts() as product (product.id)}
+				<div
+					class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+				>
 					<div class="aspect-w-1 aspect-h-1 bg-gray-200">
 						{#if product.imageUrl}
-							<img
-								src={product.imageUrl}
-								alt={product.name}
-								class="w-full h-48 object-cover"
-							/>
+							<img src={product.imageUrl} alt={product.name} class="h-48 w-full object-cover" />
 						{:else}
-							<div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+							<div class="flex h-48 w-full items-center justify-center bg-gray-200">
 								<span class="text-gray-400">Sin imagen</span>
 							</div>
 						{/if}
 					</div>
 					<div class="p-4">
-						<h3 class="text-lg font-semibold text-gray-900 mb-1">{product.name}</h3>
+						<h3 class="mb-1 text-lg font-semibold text-gray-900">{product.name}</h3>
 						{#if product.category}
-							<span class="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mb-2">
+							<span
+								class="mb-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+							>
 								{product.category.name}
 							</span>
 						{/if}
 						{#if product.description}
-							<p class="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+							<p class="mb-3 line-clamp-2 text-sm text-gray-600">{product.description}</p>
 						{/if}
 						<div class="flex items-center justify-between">
-							<span class="text-2xl font-bold text-gray-900">{formatPrice(Number(product.price))}</span>
+							<span class="text-2xl font-bold text-gray-900"
+								>{formatPrice(Number(product.price))}</span
+							>
 							{#if product.stock > 0}
 								<span class="text-sm text-green-600">Stock: {product.stock}</span>
 							{:else}
 								<span class="text-sm text-red-600">Sin stock</span>
 							{/if}
 						</div>
-						<a
-							href="/catalog/{product.id}"
-							class="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center block"
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+						<button
+							onclick={() => goto(`/catalog/${product.id}`)}
+							class="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-white transition-colors hover:bg-blue-700"
 						>
 							Ver detalles
-						</a>
+						</button>
 					</div>
 				</div>
 			{/each}
 		</div>
 
 		{#if filteredProducts.length === 0}
-			<div class="text-center py-12">
-				<p class="text-gray-500 text-lg">No se encontraron productos</p>
+			<div class="py-12 text-center">
+				<p class="text-lg text-gray-500">No se encontraron productos</p>
 			</div>
 		{/if}
 	</div>
