@@ -23,7 +23,7 @@ Plataforma de ventas online para pequeños/medianos negocios que **digitaliza el
 
 | Etapa | Descripción | Estado |
 |-------|-------------|--------|
-| **F0 – Setup** | Docker, Prisma, DB | 🟡 En progreso |
+| **F0 – Setup** | Docker, Prisma, DB | ✅ Completado |
 | **F1 – Catálogo** | Listar productos, detalle | 🔴 Pendiente |
 | **F2 – Carrito** | Agregar, persistir, ver | 🔴 Pendiente |
 | **F3 – WhatsApp** | Generar mensaje y redirigir | 🔴 Pendiente |
@@ -32,15 +32,15 @@ Plataforma de ventas online para pequeños/medianos negocios que **digitaliza el
 
 ---
 
-## � Base de Datos (Prisma)
+## 🗂️ Base de Datos (Prisma)
 
 | Modelo | Descripción | Estado |
 |--------|-------------|--------|
 | `Product` | Catálogo con precio/stock | ✅ Implementado |
-| `Category` | Categorías de productos | 🔴 Pendiente |
-| `AdminUser` | Credenciales admin | 🔴 Pendiente |
+| `Category` | Categorías de productos | ✅ Implementado |
+| `AdminUser` | Credenciales admin | ✅ Implementado |
 | `Order` | (Opcional) tracking pedidos | ⏳ Decidir |
-| `Settings` | Config negocio (WhatsApp, nombre, logo) | 🔴 Pendiente |
+| `Settings` | Config negocio (WhatsApp, nombre, logo) | ✅ Implementado |
 
 ---
 
@@ -135,4 +135,7 @@ Dirección:
 ## 📝 Notas de Desarrollo
 
 - **2025-05-02:** Setup inicial con Docker, agregado modelo `Product` básico en Prisma
+- **2025-05-03:** Agregado modelo `Category` con relación a `Product`, campos `isActive` en Product, seed de ejemplo creado
+- **2025-05-03:** Agregado modelo `Settings` (storeName, whatsappNumber, logoUrl, welcomeMessage)
+- **2025-05-03:** Agregado modelo `AdminUser` con bcrypt para password hashing, helper de auth creado
 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
@@ -25,7 +23,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@amadeostore.com
       PGADMIN_DEFAULT_PASSWORD: Amadeo2026!
     ports:
-      - '5050:80'
+      - '5051:80'
     depends_on:
       - postgres
     networks:
@@ -36,7 +34,7 @@ services:
     container_name: amadeostore-app
     restart: unless-stopped
     ports:
-      - '5173:5173'
+      - '3000:5173'
     depends_on:
       - postgres
     environment:
