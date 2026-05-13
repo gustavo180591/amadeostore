@@ -79,7 +79,7 @@ export async function authenticateAdmin(
 	// Don't return password
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { passwordHash: _password, role: _role, ...userWithoutPassword } = user;
-	
+
 	return {
 		id: userWithoutPassword.id,
 		email: userWithoutPassword.email,
