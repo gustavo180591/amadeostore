@@ -26,44 +26,51 @@ export async function createAdminUser(
 ): Promise<AdminUser> {
 	const hashedPassword = await hashPassword(password);
 
-	const user = await prisma.adminUser.create({
+	const user = await prisma.user.create({
 		data: {
 			email,
-			password: hashedPassword,
-			name,
-			isActive: true
+			passwordHash: hashedPassword,
+			name: name || 'Admin',
+			role: 'ADMIN',
+			status: 'ACTIVE'
 		},
 		select: {
 			id: true,
 			email: true,
 			name: true,
-			isActive: true
+			status: true
 		}
 	});
 
-	return user;
+	return {
+		id: user.id,
+		email: user.email,
+		name: user.name,
+		isActive: user.status === 'ACTIVE'
+	};
 }
 
 export async function authenticateAdmin(
 	email: string,
 	password: string
 ): Promise<AdminUser | null> {
-	const user = await prisma.adminUser.findUnique({
+	const user = await prisma.user.findUnique({
 		where: { email },
 		select: {
 			id: true,
 			email: true,
-			password: true,
+			passwordHash: true,
 			name: true,
-			isActive: true
+			status: true,
+			role: true
 		}
 	});
 
-	if (!user || !user.isActive) {
+	if (!user || user.role !== 'ADMIN' || user.status !== 'ACTIVE') {
 		return null;
 	}
 
-	const isValid = await verifyPassword(password, user.password);
+	const isValid = await verifyPassword(password, user.passwordHash);
 
 	if (!isValid) {
 		return null;
@@ -71,20 +78,36 @@ export async function authenticateAdmin(
 
 	// Don't return password
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const { password: _password, ...userWithoutPassword } = user;
-	return userWithoutPassword;
+	const { passwordHash: _password, role: _role, ...userWithoutPassword } = user;
+	
+	return {
+		id: userWithoutPassword.id,
+		email: userWithoutPassword.email,
+		name: userWithoutPassword.name,
+		isActive: userWithoutPassword.status === 'ACTIVE'
+	};
 }
 
 export async function getAdminUserById(id: string): Promise<AdminUser | null> {
-	const user = await prisma.adminUser.findUnique({
+	const user = await prisma.user.findUnique({
 		where: { id },
 		select: {
 			id: true,
 			email: true,
 			name: true,
-			isActive: true
+			status: true,
+			role: true
 		}
 	});
 
-	return user;
+	if (!user || user.role !== 'ADMIN' || user.status !== 'ACTIVE') {
+		return null;
+	}
+
+	return {
+		id: user.id,
+		email: user.email,
+		name: user.name,
+		isActive: user.status === 'ACTIVE'
+	};
 }
