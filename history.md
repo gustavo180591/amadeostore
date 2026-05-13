@@ -141,3 +141,16 @@ Dirección:
 - **2025-05-03:** Agregado modelo `Category` con relación a `Product`, campos `isActive` en Product, seed de ejemplo creado
 - **2025-05-03:** Agregado modelo `Settings` (storeName, whatsappNumber, logoUrl, welcomeMessage)
 - **2025-05-03:** Agregado modelo `AdminUser` con bcrypt para password hashing, helper de auth creado
+
+### Actualizaciones recientes
+
+- **2026-05-13:** Integración y ajustes principales
+  - Actualicé la UI de administración: `src/routes/admin/login/+page.svelte` ahora incluye el logo, formulario de login y layout limpio; `src/routes/admin/+layout.svelte` contiene el render para rutas hijas.
+  - Reemplacé el icono placeholder por la imagen real `/logo.png` y ajusté su tamaño (se aumentó ~125%).
+  - Actualicé el `.env` con variables locales y sincronicé `docker-compose.yml` (usuario/clave y puerto PostgreSQL). Se levantaron los contenedores con `docker compose up -d`.
+  - Aplicadas migraciones de Prisma:
+    - `npx prisma migrate deploy` para despliegue inicial
+    - `npx prisma migrate dev --name update-schema` para cambios locales (se agregaron modelos `Order`, `OrderItem`, `CartItem` y relaciones inversas en `User`).
+  - Verifiqué tablas en la base de datos dentro del contenedor (`docker exec amadeostore-db psql ... \dt`) y confirmé los modelos: `AdminUser`/`Category`/`Product`/`Settings`/`_prisma_migrations` y nuevas tablas de pedido.
+
+Nota: si el volumen de Postgres ya existía con credenciales previas, fue necesario recrearlo (`docker compose down -v`) para aplicar nuevos valores de `POSTGRES_USER`/`POSTGRES_PASSWORD`.

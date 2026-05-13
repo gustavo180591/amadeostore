@@ -5,10 +5,10 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: amadeo-store
-      POSTGRES_USER: amadeostore
-      POSTGRES_PASSWORD: Amadeo123
+      POSTGRES_USER: amadeo-store
+      POSTGRES_PASSWORD: AmadeoStore123
     ports:
-      - '5439:5432'
+      - '5440:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -38,7 +38,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgresql://amadeostore:Amadeo123@postgres:5432/amadeo-store
+      DATABASE_URL: postgresql://amadeo-store:AmadeoStore123@postgres:5432/amadeo-store
     networks:
       - amadeostore-network
     command: sh -c "npm install && npm run dev -- --host"

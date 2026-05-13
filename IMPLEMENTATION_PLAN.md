@@ -30,6 +30,9 @@
 - [x] **Gestión de productos** (CRUD básico)
 - [x] **Gestión de categorías**
 - [x] **Settings de la tienda**
+- [x] **Prisma: migraciones aplicadas** (modelos `Order`, `OrderItem`, `CartItem` añadidos)
+
+**Notas recientes:** se aplicaron migraciones locales y de despliegue; la base de datos contiene ahora tablas para pedidos, items de pedido y carrito.
 
 ---
 
@@ -39,11 +42,11 @@
 
 #### 1.1 Sistema de Login
 
-- [ ] **Página de login** (`/admin/login`)
-  - Formulario email/password
-  - Validación de credenciales
-  - Manejo de errores
-  - Redirección al dashboard
+- [x] **Página de login** (`/admin/login`) (UI inicial implementada)
+  - Formulario email/password (implementado)
+  - Validación de credenciales (server-side present)
+  - Manejo de errores (parcial)
+  - Redirección al dashboard (implementado)
 - [ ] **Sesión de admin**
   - Cookies de sesión
   - Middleware de protección de rutas
@@ -141,8 +144,7 @@
 
 #### 3.2 Gestión de Pedidos
 
-- [ ] **Modelo de datos para pedidos**
-  - Order, OrderItem, Customer
+- [x] **Modelo de datos para pedidos** (Order, OrderItem, CartItem añadidos y migrados)
 - [ ] **Panel de admin para pedidos**
   - Listado de pedidos
   - Estados (pendiente, confirmado, enviado, entregado)
@@ -275,19 +277,19 @@ src/lib/
 ├── server/
 │   ├── orders.ts
 │   └── upload.ts
-└── components/
-    ├── admin/
-    │   ├── Sidebar.svelte
-    │   ├── ProductForm.svelte
-    │   └── CategoryForm.svelte
-    └── cart/
-        ├── CartItem.svelte
-        └── CartSummary.svelte
-```
 
----
+## Actualizaciones recientes (resumen)
 
-## 📅 Cronograma Sugerido
+- **2026-05-13:** Cambios aplicados y verificados
+  - Sincronización `.env` y `docker-compose.yml` (puerto DB y credenciales actualizadas). Volumen de Postgres recreado cuando fue necesario.
+  - Interfaz de login admin ajustada en `src/routes/admin/login/+page.svelte` y layout en `src/routes/admin/+layout.svelte` con render de rutas hijas.
+  - Logo reemplazado por `/logo.png` y escalado (≈125%).
+  - Migrations aplicadas: se añadieron `Order`, `OrderItem`, `CartItem` y relaciones inversas en `User`. Migraciones creadas y aplicadas (`npx prisma migrate dev --name update-schema`).
+  - Verificación de tablas en DB mediante `docker exec amadeostore-db psql -U ... \dt`.
+
+Estos cambios actualizan el plan y mueven varias tareas (login UI, schema y migraciones) a estado implementado o parcialmente implementado.
+
+_Última actualización: 13 de Mayo 2026_
 
 ### Semana 1-2: Panel de Administración
 
@@ -345,3 +347,4 @@ src/lib/
 ---
 
 _Última actualización: 12 de Mayo 2026_
+```
