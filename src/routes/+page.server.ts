@@ -6,7 +6,7 @@ export async function load() {
 	try {
 		// Get featured products
 		const featuredProducts = await prisma.product.findMany({
-			where: { 
+			where: {
 				isFeatured: true,
 				status: 'ACTIVE'
 			},
@@ -25,7 +25,7 @@ export async function load() {
 
 		// Get latest products
 		const latestProducts = await prisma.product.findMany({
-			where: { 
+			where: {
 				status: 'ACTIVE'
 			},
 			include: {
