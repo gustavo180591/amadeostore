@@ -51,7 +51,7 @@ export const actions = {
 	store: async ({ request }: { request: Request }) => {
 		try {
 			const data = await request.formData();
-			
+
 			const storeName = data.get('storeName') as string;
 			const storeEmail = data.get('storeEmail') as string;
 			const storePhone = data.get('storePhone') as string;
@@ -107,7 +107,6 @@ export const actions = {
 			return {
 				success: 'Configuración de tienda actualizada exitosamente'
 			};
-
 		} catch (error) {
 			console.error('Error updating store settings:', error);
 			return fail(500, {
@@ -126,7 +125,7 @@ export const actions = {
 			}
 
 			const data = await request.formData();
-			
+
 			const currentPassword = data.get('currentPassword') as string;
 			const newPassword = data.get('newPassword') as string;
 			const confirmPassword = data.get('confirmPassword') as string;
@@ -187,7 +186,6 @@ export const actions = {
 			return {
 				success: 'Contraseña actualizada exitosamente'
 			};
-
 		} catch (error) {
 			console.error('Error updating password:', error);
 			return fail(500, {
@@ -251,10 +249,9 @@ export const actions = {
 
 			// Redirect to login page
 			throw redirect(303, '/admin/login');
-
 		} catch (error: any) {
 			console.error('Error deleting account:', error);
-			
+
 			// If it's a redirect, let it propagate
 			if (error?.location) {
 				throw error;

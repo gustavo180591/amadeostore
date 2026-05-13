@@ -31,7 +31,7 @@ export const actions = {
 	default: async ({ request }: { request: Request }) => {
 		try {
 			const data = await request.formData();
-			
+
 			// Extract and validate form data
 			const name = data.get('name') as string;
 			const slug = data.get('slug') as string;
@@ -109,9 +109,18 @@ export const actions = {
 			}
 
 			// Generate slug if not provided
-			const finalSlug = slug && slug.trim().length > 0 
-				? slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-				: name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+			const finalSlug =
+				slug && slug.trim().length > 0
+					? slug
+							.trim()
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, '-')
+							.replace(/(^-|-$)/g, '')
+					: name
+							.trim()
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, '-')
+							.replace(/(^-|-$)/g, '');
 
 			// Check if slug already exists
 			const existingSlug = await prisma.category.findUnique({
@@ -172,10 +181,9 @@ export const actions = {
 				success: 'Categoría creada exitosamente',
 				category
 			};
-
 		} catch (error) {
 			console.error('Error creating category:', error);
-			
+
 			if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
 				// Unique constraint violation
 				return fail(400, {

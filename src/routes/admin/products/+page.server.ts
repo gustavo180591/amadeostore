@@ -34,14 +34,15 @@ export async function load() {
 		// Calculate statistics
 		const stats = {
 			totalProducts: products.length,
-			activeProducts: products.filter(p => p.status === 'ACTIVE').length,
-			inactiveProducts: products.filter(p => p.status === 'INACTIVE').length,
-			outOfStockProducts: products.filter(p => p.status === 'OUT_OF_STOCK' || p.stock === 0).length,
-			featuredProducts: products.filter(p => p.isFeatured).length,
+			activeProducts: products.filter((p) => p.status === 'ACTIVE').length,
+			inactiveProducts: products.filter((p) => p.status === 'INACTIVE').length,
+			outOfStockProducts: products.filter((p) => p.status === 'OUT_OF_STOCK' || p.stock === 0)
+				.length,
+			featuredProducts: products.filter((p) => p.isFeatured).length,
 			totalValue: products.reduce((sum, product) => {
-				return sum + (Number(product.price) * product.stock);
+				return sum + Number(product.price) * product.stock;
 			}, 0),
-			lowStockProducts: products.filter(p => p.stock > 0 && p.stock <= 5).length
+			lowStockProducts: products.filter((p) => p.stock > 0 && p.stock <= 5).length
 		};
 
 		return {
