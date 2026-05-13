@@ -31,7 +31,7 @@ export const actions = {
 	default: async ({ request }: { request: Request }) => {
 		try {
 			const data = await request.formData();
-			
+
 			// Extract and validate form data
 			const name = data.get('name') as string;
 			const sku = data.get('sku') as string;
@@ -132,10 +132,12 @@ export const actions = {
 			}
 
 			// Generate slug if not provided
-			const finalSlug = slug || name
-				.toLowerCase()
-				.replace(/[^a-z0-9]+/g, '-')
-				.replace(/(^-|-$)/g, '');
+			const finalSlug =
+				slug ||
+				name
+					.toLowerCase()
+					.replace(/[^a-z0-9]+/g, '-')
+					.replace(/(^-|-$)/g, '');
 
 			// Check if SKU already exists (if provided)
 			if (sku) {
@@ -234,10 +236,9 @@ export const actions = {
 				success: 'Producto creado exitosamente',
 				product
 			};
-
 		} catch (error) {
 			console.error('Error creating product:', error);
-			
+
 			if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
 				// Unique constraint violation
 				return fail(400, {
