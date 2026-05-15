@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let isLoading = $state(false);
 	let selectedCategory = $state('');
@@ -34,7 +35,7 @@
 	const handleImageUpload = async (event: Event) => {
 		const target = event.target as HTMLInputElement;
 		const files = target.files;
-		
+
 		if (!files || files.length === 0) return;
 
 		isUploading = true;
@@ -56,7 +57,7 @@
 				}
 
 				const result = await response.json();
-				
+
 				if (result.success && result.imageUrl && result.imageId) {
 					uploadedImages = [...uploadedImages, { url: result.imageUrl, id: result.imageId }];
 				} else {
@@ -90,7 +91,7 @@
 				throw new Error('Error al eliminar imagen');
 			}
 
-			uploadedImages = uploadedImages.filter(img => img.id !== imageId);
+			uploadedImages = uploadedImages.filter((img) => img.id !== imageId);
 		} catch (error) {
 			uploadError = error instanceof Error ? error.message : 'Error al eliminar la imagen';
 		}
@@ -110,7 +111,7 @@
 				<div class="flex items-center">
 					<button
 						type="button"
-						onclick={() => goto('/admin/products')}
+						onclick={() => goto(resolve('/admin/products'))}
 						class="mr-4 text-gray-400 transition-colors hover:text-gray-600"
 						aria-label="Volver a productos"
 					>
@@ -125,7 +126,10 @@
 					</button>
 					<h1 class="text-lg font-semibold text-gray-900">Nuevo Producto</h1>
 				</div>
-				<a href="/admin" class="text-sm text-gray-500 transition-colors hover:text-gray-700">
+				<a
+					href={resolve('/admin')}
+					class="text-sm text-gray-500 transition-colors hover:text-gray-700"
+				>
 					← Volver al panel
 				</a>
 			</div>
@@ -147,7 +151,7 @@
 					return async ({ result }) => {
 						isLoading = false;
 						if (result.type === 'success') {
-							await goto('/admin/products');
+							await goto(resolve('/admin/products'));
 						}
 					};
 				}}
@@ -349,15 +353,38 @@
 						Imágenes del Producto
 					</label>
 					<div class="mt-1">
-						<div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+						<div
+							class="flex justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 pt-5 pb-6 transition-colors hover:border-gray-400"
+						>
 							<div class="space-y-1 text-center">
-								<svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-									<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								<svg
+									class="mx-auto h-12 w-12 text-gray-400"
+									stroke="currentColor"
+									fill="none"
+									viewBox="0 0 48 48"
+								>
+									<path
+										d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
 								</svg>
 								<div class="flex text-sm text-gray-600">
-									<label for="imageUpload" class="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
+									<label
+										for="imageUpload"
+										class="relative cursor-pointer rounded-md bg-white font-medium text-green-600 focus-within:ring-2 focus-within:ring-green-500 focus-within:ring-offset-2 focus-within:outline-none hover:text-green-500"
+									>
 										<span>Subir archivos</span>
-										<input id="imageUpload" name="imageUpload" type="file" class="sr-only" accept="image/*" multiple onchange={handleImageUpload} />
+										<input
+											id="imageUpload"
+											name="imageUpload"
+											type="file"
+											class="sr-only"
+											accept="image/*"
+											multiple
+											onchange={handleImageUpload}
+										/>
 									</label>
 									<p class="pl-1">o arrastrar y soltar</p>
 								</div>
@@ -369,23 +396,28 @@
 					<!-- Uploaded Images -->
 					{#if uploadedImages.length > 0}
 						<div class="mt-4">
-							<h4 class="text-sm font-medium text-gray-700 mb-2">Imágenes subidas</h4>
-							<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+							<h4 class="mb-2 text-sm font-medium text-gray-700">Imágenes subidas</h4>
+							<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
 								{#each uploadedImages as image (image.id)}
-									<div class="relative group">
-										<img 
-											src={image.url} 
+									<div class="group relative">
+										<img
+											src={image.url}
 											alt="Imagen del producto"
-											class="w-full h-24 object-cover rounded-lg border border-gray-200"
+											class="h-24 w-full rounded-lg border border-gray-200 object-cover"
 										/>
 										<button
 											type="button"
 											onclick={() => deleteImage(image.id)}
-											class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+											class="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
 											title="Eliminar imagen"
 										>
 											<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M6 18L18 6M6 6l12 12"
+												/>
 											</svg>
 										</button>
 									</div>
@@ -397,12 +429,23 @@
 					<!-- Upload Progress -->
 					{#if isUploading}
 						<div class="mt-2">
-							<div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+							<div class="rounded-md border border-blue-200 bg-blue-50 p-3">
 								<div class="flex">
 									<div class="shrink-0">
-										<svg class="h-5 w-5 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
-											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										<svg class="h-5 w-5 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24">
+											<circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+											></circle>
+											<path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+											></path>
 										</svg>
 									</div>
 									<div class="ml-3">
@@ -416,11 +459,15 @@
 					<!-- Upload Error -->
 					{#if uploadError}
 						<div class="mt-2">
-							<div class="bg-red-50 border border-red-200 rounded-md p-3">
+							<div class="rounded-md border border-red-200 bg-red-50 p-3">
 								<div class="flex">
 									<div class="shrink-0">
 										<svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+											<path
+												fill-rule="evenodd"
+												d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+												clip-rule="evenodd"
+											/>
 										</svg>
 									</div>
 									<div class="ml-3">
@@ -450,7 +497,7 @@
 				<div class="flex justify-end space-x-3 border-t border-gray-200 pt-6">
 					<button
 						type="button"
-						onclick={() => goto('/admin/products')}
+						onclick={() => goto(resolve('/admin/products'))}
 						class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
 					>
 						Cancelar

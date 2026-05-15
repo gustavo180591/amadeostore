@@ -53,13 +53,17 @@ export async function load({ params }) {
 		});
 
 		// Convert Decimal to number for serialization
-		const serializeProduct = (product: any) => ({
+		const serializeProduct = (
+			product: Product & { category: Category | null; images: ProductImage[] }
+		) => ({
 			...product,
 			price: Number(product.price),
 			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
 		});
 
-		const serializeProducts = (products: any[]) => {
+		const serializeProducts = (
+			products: (Product & { category: Category | null; images: ProductImage[] })[]
+		) => {
 			return products.map(serializeProduct);
 		};
 
@@ -71,7 +75,7 @@ export async function load({ params }) {
 		if (err instanceof Error && err.message.includes('not found')) {
 			throw err;
 		}
-		
+
 		console.error('Error loading product:', err);
 		throw error(500, 'Error loading product');
 	}

@@ -15,7 +15,20 @@ const settingsStore = {
 	faviconUrl: '/favicon.ico'
 };
 
-export async function load({ locals }: { locals: any }) {
+export async function load({
+	locals
+}: {
+	locals: {
+		user?: {
+			id: string;
+			name: string;
+			email: string;
+			role: string;
+			status: string;
+			createdAt: Date;
+		} | null;
+	};
+}) {
 	try {
 		// Get current admin user
 		let adminUser = null;
@@ -116,7 +129,22 @@ export const actions = {
 	},
 
 	// Password change
-	password: async ({ request, locals }: { request: Request; locals: any }) => {
+	password: async ({
+		request,
+		locals
+	}: {
+		request: Request;
+		locals: {
+			user?: {
+				id: string;
+				name: string;
+				email: string;
+				role: string;
+				status: string;
+				createdAt: Date;
+			} | null;
+		};
+	}) => {
 		try {
 			if (!locals.user) {
 				return fail(401, {
@@ -195,7 +223,22 @@ export const actions = {
 	},
 
 	// Delete account (dangerous action)
-	deleteAccount: async ({ request, locals }: { request: Request; locals: any }) => {
+	deleteAccount: async ({
+		request,
+		locals
+	}: {
+		request: Request;
+		locals: {
+			user?: {
+				id: string;
+				name: string;
+				email: string;
+				role: string;
+				status: string;
+				createdAt: Date;
+			} | null;
+		};
+	}) => {
 		try {
 			if (!locals.user) {
 				return fail(401, {
@@ -249,11 +292,11 @@ export const actions = {
 
 			// Redirect to login page
 			throw redirect(303, '/admin/login');
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error('Error deleting account:', error);
 
 			// If it's a redirect, let it propagate
-			if (error?.location) {
+			if (error && typeof error === 'object' && 'location' in error) {
 				throw error;
 			}
 

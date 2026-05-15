@@ -25,7 +25,7 @@ function createCartStore() {
 		subscribe,
 		set,
 		update,
-		
+
 		// Add item to cart
 		addItem: async (productId: string, quantity: number = 1) => {
 			try {
@@ -42,22 +42,20 @@ function createCartStore() {
 				if (result.success) {
 					// Show success message
 					alert('Producto agregado al carrito exitosamente');
-					
+
 					// Update local cart state (simplified for now)
-					update(cart => {
-						const existingItem = cart.items.find(item => item.id === productId);
-						
+					update((cart) => {
+						const existingItem = cart.items.find((item) => item.id === productId);
+
 						if (existingItem) {
 							// Update quantity
 							return {
 								...cart,
-								items: cart.items.map(item =>
-									item.id === productId
-										? { ...item, quantity: item.quantity + quantity }
-										: item
+								items: cart.items.map((item) =>
+									item.id === productId ? { ...item, quantity: item.quantity + quantity } : item
 								),
 								count: cart.count + quantity,
-								total: cart.total + (result.product.price * quantity)
+								total: cart.total + result.product.price * quantity
 							};
 						} else {
 							// Add new item
@@ -68,12 +66,12 @@ function createCartStore() {
 								imageUrl: result.product.imageUrl,
 								quantity: result.product.quantity
 							};
-							
+
 							return {
 								...cart,
 								items: [...cart.items, newItem],
 								count: cart.count + quantity,
-								total: cart.total + (result.product.price * quantity)
+								total: cart.total + result.product.price * quantity
 							};
 						}
 					});
@@ -88,15 +86,15 @@ function createCartStore() {
 
 		// Remove item from cart
 		removeItem: (productId: string) => {
-			update(cart => {
-				const item = cart.items.find(item => item.id === productId);
+			update((cart) => {
+				const item = cart.items.find((item) => item.id === productId);
 				if (!item) return cart;
 
 				return {
 					...cart,
-					items: cart.items.filter(item => item.id !== productId),
+					items: cart.items.filter((item) => item.id !== productId),
 					count: cart.count - item.quantity,
-					total: cart.total - (item.price * item.quantity)
+					total: cart.total - item.price * item.quantity
 				};
 			});
 		},
@@ -107,21 +105,17 @@ function createCartStore() {
 				return; // Don't allow zero or negative quantities
 			}
 
-			update(cart => {
-				const item = cart.items.find(item => item.id === productId);
+			update((cart) => {
+				const item = cart.items.find((item) => item.id === productId);
 				if (!item) return cart;
 
 				const quantityDiff = quantity - item.quantity;
-				
+
 				return {
 					...cart,
-					items: cart.items.map(item =>
-						item.id === productId
-							? { ...item, quantity }
-							: item
-					),
+					items: cart.items.map((item) => (item.id === productId ? { ...item, quantity } : item)),
 					count: cart.count + quantityDiff,
-					total: cart.total + (item.price * quantityDiff)
+					total: cart.total + item.price * quantityDiff
 				};
 			});
 		},

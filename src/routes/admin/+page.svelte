@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { resolve } from '$app/paths';
 
 	let { data }: { data: PageData } = $props();
 
@@ -29,7 +30,7 @@
 		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<div class="p-5">
 				<div class="flex items-center">
-					<div class="flex-shrink-0">
+					<div class="shrink-0">
 						<div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-500">
 							<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -55,7 +56,7 @@
 		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<div class="p-5">
 				<div class="flex items-center">
-					<div class="flex-shrink-0">
+					<div class="shrink-0">
 						<div class="flex h-8 w-8 items-center justify-center rounded-md bg-green-500">
 							<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -81,7 +82,7 @@
 		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<div class="p-5">
 				<div class="flex items-center">
-					<div class="flex-shrink-0">
+					<div class="shrink-0">
 						<div class="flex h-8 w-8 items-center justify-center rounded-md bg-yellow-500">
 							<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -109,7 +110,7 @@
 		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<div class="p-5">
 				<div class="flex items-center">
-					<div class="flex-shrink-0">
+					<div class="shrink-0">
 						<div class="flex h-8 w-8 items-center justify-center rounded-md bg-red-500">
 							<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -139,10 +140,10 @@
 				<h3 class="mb-4 text-lg leading-6 font-medium text-gray-900">Productos Recientes</h3>
 				<div class="flow-root">
 					<ul class="-my-5 divide-y divide-gray-200">
-						{#each data.recentProducts as product}
+						{#each data.recentProducts as product (product.id)}
 							<li class="py-4">
 								<div class="flex items-center space-x-4">
-									<div class="flex-shrink-0">
+									<div class="shrink-0">
 										<div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
 											<svg
 												class="h-4 w-4 text-gray-500"
@@ -192,10 +193,10 @@
 				<h3 class="mb-4 text-lg leading-6 font-medium text-gray-900">Productos con Stock Bajo</h3>
 				<div class="flow-root">
 					<ul class="-my-5 divide-y divide-gray-200">
-						{#each data.lowStockProducts as product}
+						{#each data.lowStockProducts as product (product.id)}
 							<li class="py-4">
 								<div class="flex items-center space-x-4">
-									<div class="flex-shrink-0">
+									<div class="shrink-0">
 										<div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
 											<svg
 												class="h-4 w-4 text-red-600"
@@ -248,7 +249,7 @@
 				<h3 class="mb-4 text-lg leading-6 font-medium text-gray-900">Acciones Rápidas</h3>
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					<a
-						href="/admin/products/new"
+						href={resolve('/admin/products/new')}
 						class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
 					>
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,7 +264,7 @@
 					</a>
 
 					<a
-						href="/admin/categories/new"
+						href={resolve('/admin/categories/new')}
 						class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
 					>
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,7 +279,7 @@
 					</a>
 
 					<a
-						href="/admin/products"
+						href={resolve('/admin/products')}
 						class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
 					>
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +294,7 @@
 					</a>
 
 					<a
-						href="/admin/settings"
+						href={resolve('/admin/settings')}
 						class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
 					>
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

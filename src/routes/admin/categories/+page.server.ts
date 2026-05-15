@@ -15,10 +15,7 @@ export async function load() {
 					}
 				}
 			},
-			orderBy: [
-				{ sortOrder: 'asc' },
-				{ name: 'asc' }
-			]
+			orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }]
 		});
 
 		// Get statistics

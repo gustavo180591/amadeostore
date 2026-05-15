@@ -51,7 +51,7 @@ export const actions = {
 	update: async ({ request, params }) => {
 		try {
 			const formData = await request.formData();
-			
+
 			const name = formData.get('name') as string;
 			const description = formData.get('description') as string;
 			const price = formData.get('price') as string;
@@ -67,7 +67,18 @@ export const actions = {
 			if (!name || !price || !stock) {
 				return fail(400, {
 					message: 'Los campos nombre, precio y stock son obligatorios',
-					values: { name, description, price, compareAtPrice, stock, sku, imageUrl, categoryId, status, isFeatured }
+					values: {
+						name,
+						description,
+						price,
+						compareAtPrice,
+						stock,
+						sku,
+						imageUrl,
+						categoryId,
+						status,
+						isFeatured
+					}
 				});
 			}
 
@@ -83,7 +94,18 @@ export const actions = {
 				if (existingProduct) {
 					return fail(400, {
 						message: 'El SKU ya está en uso por otro producto',
-						values: { name, description, price, compareAtPrice, stock, sku, imageUrl, categoryId, status, isFeatured }
+						values: {
+							name,
+							description,
+							price,
+							compareAtPrice,
+							stock,
+							sku,
+							imageUrl,
+							categoryId,
+							status,
+							isFeatured
+						}
 					});
 				}
 			}
@@ -123,7 +145,6 @@ export const actions = {
 				message: 'Producto actualizado correctamente',
 				product: serializedProduct
 			};
-
 		} catch (error) {
 			console.error('Error updating product:', error);
 			return fail(500, {

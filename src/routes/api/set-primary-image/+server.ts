@@ -47,7 +47,6 @@ export async function POST({ request }) {
 			message: 'Imagen principal actualizada',
 			image: updatedImage
 		});
-
 	} catch (err) {
 		console.error('Error setting primary image:', err);
 		return error(500, 'Error interno del servidor');

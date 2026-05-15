@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { Product, Category } from '@prisma/client';
 
 	let data = $props<{
@@ -101,9 +102,8 @@
 								<span class="text-sm text-red-600">Sin stock</span>
 							{/if}
 						</div>
-						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 						<button
-							onclick={() => goto(`/catalog/${product.id}`)}
+							onclick={() => goto(resolve(`/catalog/${product.id}`))}
 							class="mt-4 block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-white transition-colors hover:bg-blue-700"
 						>
 							Ver detalles

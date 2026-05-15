@@ -19,7 +19,6 @@
 		console.log('Products length:', products.length);
 	});
 
-	
 	// Filter products based on search and filters
 	const filteredProducts = $derived(() => {
 		let result = [...products];
@@ -80,7 +79,7 @@
 					return sortOrder === 'asc' ? 1 : -1;
 				}
 			}
-			
+
 			return 0;
 		});
 
@@ -170,7 +169,11 @@
 						</svg>
 						Nuevo Producto
 					</a>
-					<a href="/admin" class="text-sm text-gray-500 transition-colors hover:text-gray-700" rel="external">
+					<a
+						href="/admin"
+						class="text-sm text-gray-500 transition-colors hover:text-gray-700"
+						rel="external"
+					>
 						← Volver al panel
 					</a>
 				</div>

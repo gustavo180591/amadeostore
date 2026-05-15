@@ -30,7 +30,7 @@ export const load: PageServerLoad = async () => {
 		});
 
 		// Serialize prices
-		const recentProducts = recentProductsData.map(product => ({
+		const recentProducts = recentProductsData.map((product) => ({
 			...product,
 			price: Number(product.price),
 			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null

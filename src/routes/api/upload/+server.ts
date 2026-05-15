@@ -18,7 +18,6 @@ export async function POST({ request }) {
 		} else {
 			return error(400, result.error || 'Error al subir la imagen');
 		}
-
 	} catch (err) {
 		console.error('Upload error:', err);
 		return error(500, 'Error interno del servidor');
@@ -40,7 +39,6 @@ export async function DELETE({ request }) {
 		} else {
 			return error(400, result.error || 'Error al eliminar la imagen');
 		}
-
 	} catch (err) {
 		console.error('Delete error:', err);
 		return error(500, 'Error interno del servidor');

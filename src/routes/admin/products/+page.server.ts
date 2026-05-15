@@ -21,7 +21,7 @@ export async function load() {
 		});
 
 		// Serialize prices for JSON compatibility
-		const products = productsData.map(product => ({
+		const products = productsData.map((product) => ({
 			...product,
 			price: Number(product.price),
 			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
@@ -52,12 +52,12 @@ export async function load() {
 			lowStockProducts: products.filter((p) => p.stock > 0 && p.stock <= 5).length
 		};
 
-		console.log('Admin products loading:', { 
-			productsCount: products.length, 
+		console.log('Admin products loading:', {
+			productsCount: products.length,
 			categoriesCount: categories.length,
 			productsData: products.slice(0, 2) // Log first 2 products for debugging
 		});
-		
+
 		return {
 			products,
 			categories,

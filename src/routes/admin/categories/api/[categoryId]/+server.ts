@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
 	const { categoryId } = params;
-	
+
 	try {
 		const body = await request.json();
 		const { isActive } = body;
@@ -34,7 +34,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
 
 export const DELETE: RequestHandler = async ({ params }) => {
 	const { categoryId } = params;
-	
+
 	try {
 		// Check if category has products
 		const productCount = await prisma.product.count({

@@ -8,7 +8,6 @@
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
 
-	
 	// Format currency
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('es-AR', {
@@ -237,9 +236,9 @@
 										<span class="text-xs font-medium text-red-500">¡Últimas unidades!</span>
 									{/if}
 								</div>
-								<button 
+								<button
 									onclick={() => cart.addItem(product.id)}
-									class="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+									class="mt-4 w-full rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
 								>
 									Agregar al Carrito
 								</button>
@@ -350,7 +349,7 @@
 									<span class="text-xs text-gray-500">Stock: {product.stock}</span>
 								</div>
 								<div class="mt-4 flex space-x-2">
-									<button 
+									<button
 										onclick={() => cart.addItem(product.id)}
 										class="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
 									>
@@ -372,7 +371,6 @@
 		</section>
 	{/if}
 
-	
 	<!-- Footer -->
 	<footer class="bg-gray-900 text-white">
 		<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

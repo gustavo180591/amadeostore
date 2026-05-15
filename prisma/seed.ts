@@ -47,7 +47,8 @@ async function main() {
 		{
 			name: 'iPhone 15 Pro',
 			slug: 'iphone-15-pro',
-			description: 'El último iPhone con chip A17 Pro, sistema de cámaras profesional y diseño de titanio. Pantalla Super Retina XDR de 6.1 pulgadas.',
+			description:
+				'El último iPhone con chip A17 Pro, sistema de cámaras profesional y diseño de titanio. Pantalla Super Retina XDR de 6.1 pulgadas.',
 			price: 1299.99,
 			compareAtPrice: 1499.99,
 			stock: 15,
@@ -59,7 +60,8 @@ async function main() {
 		{
 			name: 'MacBook Pro 14"',
 			slug: 'macbook-pro-14',
-			description: 'Laptop profesional con chip M3 Pro, 18GB RAM, 512GB SSD. Pantalla Liquid Retina XDR de 14.2 pulgadas.',
+			description:
+				'Laptop profesional con chip M3 Pro, 18GB RAM, 512GB SSD. Pantalla Liquid Retina XDR de 14.2 pulgadas.',
 			price: 2499.99,
 			compareAtPrice: 2799.99,
 			stock: 8,
@@ -71,7 +73,8 @@ async function main() {
 		{
 			name: 'AirPods Pro (2ª Gen)',
 			slug: 'airpods-pro-2',
-			description: 'Auriculares inalámbricos con cancelación activa de ruido, audio espacial y chip H2. Hasta 6 horas de reproducción.',
+			description:
+				'Auriculares inalámbricos con cancelación activa de ruido, audio espacial y chip H2. Hasta 6 horas de reproducción.',
 			price: 249.99,
 			compareAtPrice: 299.99,
 			stock: 25,
@@ -83,7 +86,8 @@ async function main() {
 		{
 			name: 'iPad Air (5ª Gen)',
 			slug: 'ipad-air-5',
-			description: 'Tablet con chip M1, pantalla Liquid Retina de 10.9 pulgadas, 64GB WiFi. Compatible con Apple Pencil y Magic Keyboard.',
+			description:
+				'Tablet con chip M1, pantalla Liquid Retina de 10.9 pulgadas, 64GB WiFi. Compatible con Apple Pencil y Magic Keyboard.',
 			price: 599.99,
 			compareAtPrice: 699.99,
 			stock: 12,
@@ -95,7 +99,8 @@ async function main() {
 		{
 			name: 'Magic Mouse',
 			slug: 'magic-mouse',
-			description: 'Mouse inalámbrico recargable conMulti-Touch surface. Conexión Bluetooth y puerto Lightning para carga.',
+			description:
+				'Mouse inalámbrico recargable conMulti-Touch surface. Conexión Bluetooth y puerto Lightning para carga.',
 			price: 79.99,
 			compareAtPrice: null,
 			stock: 30,

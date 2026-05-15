@@ -3,7 +3,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 
 const prisma = new PrismaClient();
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async () => {
 	try {
 		// For now, return empty cart (we'll implement user authentication later)
 		return json({
@@ -13,10 +13,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (error) {
 		console.error('Error fetching cart:', error);
-		return json(
-			{ error: 'Error fetching cart' },
-			{ status: 500 }
-		);
+		return json({ error: 'Error fetching cart' }, { status: 500 });
 	}
 };
 
@@ -30,24 +27,15 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (!product) {
-			return json(
-				{ error: 'Product not found' },
-				{ status: 404 }
-			);
+			return json({ error: 'Product not found' }, { status: 404 });
 		}
 
 		if (product.status !== 'ACTIVE') {
-			return json(
-				{ error: 'Product is not available' },
-				{ status: 400 }
-			);
+			return json({ error: 'Product is not available' }, { status: 400 });
 		}
 
 		if (product.stock < quantity) {
-			return json(
-				{ error: 'Not enough stock' },
-				{ status: 400 }
-			);
+			return json({ error: 'Not enough stock' }, { status: 400 });
 		}
 
 		// For now, just return success (we'll implement actual cart logic with user authentication later)
@@ -64,9 +52,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (error) {
 		console.error('Error adding to cart:', error);
-		return json(
-			{ error: 'Error adding to cart' },
-			{ status: 500 }
-		);
+		return json({ error: 'Error adding to cart' }, { status: 500 });
 	}
 };
