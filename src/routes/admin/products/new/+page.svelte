@@ -8,6 +8,9 @@
 	let productStatus = $state('ACTIVE');
 	let isFeatured = $state(false);
 	let categories = $state<{ id: string; name: string; slug: string }[]>([]);
+	let uploadedImages = $state<{ url: string; id: string }[]>([]);
+	let isUploading = $state(false);
+	let uploadError = $state('');
 
 	const error = $derived($page.form?.error);
 	const success = $derived($page.form?.success);
@@ -26,6 +29,72 @@
 			if (nameInput) nameInput.focus();
 		}
 	});
+
+	// Handle image upload for new product
+	const handleImageUpload = async (event: Event) => {
+		const target = event.target as HTMLInputElement;
+		const files = target.files;
+		
+		if (!files || files.length === 0) return;
+
+		isUploading = true;
+		uploadError = '';
+
+		try {
+			for (const file of Array.from(files)) {
+				const formData = new FormData();
+				formData.append('image', file);
+
+				const response = await fetch('/api/upload', {
+					method: 'POST',
+					body: formData
+				});
+
+				if (!response.ok) {
+					const error = await response.text();
+					throw new Error(error);
+				}
+
+				const result = await response.json();
+				
+				if (result.success && result.imageUrl && result.imageId) {
+					uploadedImages = [...uploadedImages, { url: result.imageUrl, id: result.imageId }];
+				} else {
+					throw new Error(result.error || 'Error al subir imagen');
+				}
+			}
+
+			// Clear file input
+			target.value = '';
+		} catch (error) {
+			uploadError = error instanceof Error ? error.message : 'Error al subir la imagen';
+		} finally {
+			isUploading = false;
+		}
+	};
+
+	// Handle image deletion
+	const deleteImage = async (imageId: string) => {
+		if (!confirm('¿Estás seguro de eliminar esta imagen?')) return;
+
+		try {
+			const response = await fetch('/api/upload', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ imageId })
+			});
+
+			if (!response.ok) {
+				throw new Error('Error al eliminar imagen');
+			}
+
+			uploadedImages = uploadedImages.filter(img => img.id !== imageId);
+		} catch (error) {
+			uploadError = error instanceof Error ? error.message : 'Error al eliminar la imagen';
+		}
+	};
 </script>
 
 <svelte:head>
@@ -274,18 +343,93 @@
 					</div>
 				</div>
 
-				<!-- Image URL -->
+				<!-- Image Upload -->
 				<div>
-					<label for="imageUrl" class="mb-2 block text-sm font-medium text-gray-700">
-						URL de Imagen Principal
+					<label for="imageUpload" class="mb-2 block text-sm font-medium text-gray-700">
+						Imágenes del Producto
 					</label>
-					<input
-						id="imageUrl"
-						name="imageUrl"
-						type="url"
-						class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
-						placeholder="https://ejemplo.com/imagen.jpg"
-					/>
+					<div class="mt-1">
+						<div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+							<div class="space-y-1 text-center">
+								<svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+									<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+								<div class="flex text-sm text-gray-600">
+									<label for="imageUpload" class="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
+										<span>Subir archivos</span>
+										<input id="imageUpload" name="imageUpload" type="file" class="sr-only" accept="image/*" multiple onchange={handleImageUpload} />
+									</label>
+									<p class="pl-1">o arrastrar y soltar</p>
+								</div>
+								<p class="text-xs text-gray-500">PNG, JPG, WebP hasta 5MB</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Uploaded Images -->
+					{#if uploadedImages.length > 0}
+						<div class="mt-4">
+							<h4 class="text-sm font-medium text-gray-700 mb-2">Imágenes subidas</h4>
+							<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+								{#each uploadedImages as image (image.id)}
+									<div class="relative group">
+										<img 
+											src={image.url} 
+											alt="Imagen del producto"
+											class="w-full h-24 object-cover rounded-lg border border-gray-200"
+										/>
+										<button
+											type="button"
+											onclick={() => deleteImage(image.id)}
+											class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+											title="Eliminar imagen"
+										>
+											<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+											</svg>
+										</button>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Upload Progress -->
+					{#if isUploading}
+						<div class="mt-2">
+							<div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+								<div class="flex">
+									<div class="shrink-0">
+										<svg class="h-5 w-5 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+									</div>
+									<div class="ml-3">
+										<p class="text-sm font-medium text-blue-800">Subiendo imagen...</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Upload Error -->
+					{#if uploadError}
+						<div class="mt-2">
+							<div class="bg-red-50 border border-red-200 rounded-md p-3">
+								<div class="flex">
+									<div class="shrink-0">
+										<svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+										</svg>
+									</div>
+									<div class="ml-3">
+										<p class="text-sm font-medium text-red-800">{uploadError}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					{/if}
 				</div>
 
 				<!-- Featured Product -->

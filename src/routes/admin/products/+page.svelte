@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-	import type { PageData } from './$types';
 
 	let searchQuery = $state('');
 	let selectedStatus = $state('all');
@@ -14,14 +12,30 @@
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
 
+	// Debug: Log data to console
+	$effect(() => {
+		console.log('Page data:', data);
+		console.log('Products:', products);
+		console.log('Products length:', products.length);
+	});
+
+	
 	// Filter products based on search and filters
 	const filteredProducts = $derived(() => {
-		let filtered = [...products];
+		let result = [...products];
+
+		// Debug: Log filtering process
+		console.log('Filtering products:', {
+			initialCount: result.length,
+			searchQuery,
+			selectedStatus,
+			selectedCategory
+		});
 
 		// Search filter
 		if (searchQuery.trim()) {
 			const query = searchQuery.toLowerCase();
-			filtered = filtered.filter(
+			result = result.filter(
 				(product) =>
 					product.name.toLowerCase().includes(query) ||
 					product.sku?.toLowerCase().includes(query) ||
@@ -32,38 +46,51 @@
 
 		// Status filter
 		if (selectedStatus !== 'all') {
-			filtered = filtered.filter((product) => product.status === selectedStatus);
+			result = result.filter((product) => product.status === selectedStatus);
 		}
 
 		// Category filter
 		if (selectedCategory !== 'all') {
-			filtered = filtered.filter((product) => product.categoryId === selectedCategory);
+			result = result.filter((product) => product.categoryId === selectedCategory);
 		}
 
 		// Sort products
-		filtered.sort((a, b) => {
-			let aValue: any = a[sortBy as keyof typeof a];
-			let bValue: any = b[sortBy as keyof typeof b];
+		result.sort((a, b) => {
+			let aValue: unknown = a[sortBy as keyof typeof a];
+			let bValue: unknown = b[sortBy as keyof typeof b];
 
 			if (sortBy === 'category') {
 				aValue = a.category?.name || '';
 				bValue = b.category?.name || '';
 			}
 
-			if (typeof aValue === 'string') {
-				aValue = aValue.toLowerCase();
-				bValue = bValue.toLowerCase();
+			// Handle comparison of unknown values
+			if (typeof aValue === 'string' && typeof bValue === 'string') {
+				if (aValue < bValue) {
+					return sortOrder === 'asc' ? -1 : 1;
+				}
+				if (aValue > bValue) {
+					return sortOrder === 'asc' ? 1 : -1;
+				}
+			} else if (typeof aValue === 'number' && typeof bValue === 'number') {
+				if (aValue < bValue) {
+					return sortOrder === 'asc' ? -1 : 1;
+				}
+				if (aValue > bValue) {
+					return sortOrder === 'asc' ? 1 : -1;
+				}
 			}
-
-			if (sortOrder === 'asc') {
-				return aValue > bValue ? 1 : -1;
-			} else {
-				return aValue < bValue ? 1 : -1;
-			}
+			
+			return 0;
 		});
 
-		return filtered;
-	});
+		console.log('Filtered products result:', {
+			finalCount: result.length,
+			result: result.slice(0, 2)
+		});
+
+		return result;
+	}) as typeof products;
 
 	// Format currency
 	const formatCurrency = (amount: number) => {
@@ -131,6 +158,7 @@
 					<a
 						href="/admin/products/new"
 						class="inline-flex items-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+						rel="external"
 					>
 						<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -142,7 +170,7 @@
 						</svg>
 						Nuevo Producto
 					</a>
-					<a href="/admin" class="text-sm text-gray-500 transition-colors hover:text-gray-700">
+					<a href="/admin" class="text-sm text-gray-500 transition-colors hover:text-gray-700" rel="external">
 						← Volver al panel
 					</a>
 				</div>
@@ -335,7 +363,7 @@
 						class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
 					>
 						<option value="all">Todas las categorías</option>
-						{#each categories as category}
+						{#each categories as category (category.id)}
 							<option value={category.id}>{category.name}</option>
 						{/each}
 					</select>
@@ -381,7 +409,7 @@
 					<h3 class="text-lg leading-6 font-medium text-gray-900">Lista de Productos</h3>
 				</div>
 
-				{#if filteredProducts.length === 0}
+				{#if products.length === 0}
 					<div class="px-6 py-12 text-center">
 						<svg
 							class="mx-auto h-12 w-12 text-gray-400"
@@ -407,6 +435,7 @@
 								<a
 									href="/admin/products/new"
 									class="inline-flex items-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+									rel="external"
 								>
 									<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path
@@ -467,7 +496,7 @@
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-200 bg-white">
-							{#each filteredProducts as product (product.id)}
+							{#each products as product (product.id)}
 								<tr class="hover:bg-gray-50">
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="flex items-center">
@@ -548,6 +577,7 @@
 												href="/admin/products/{product.id}/edit"
 												class="text-green-600 transition-colors hover:text-green-900"
 												title="Editar producto"
+												rel="external"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path

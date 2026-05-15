@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export async function getProducts() {
 	const products = await prisma.product.findMany({
-		where: { isActive: true },
+		where: { status: 'ACTIVE' },
 		include: {
 			category: true
 		},
@@ -19,8 +19,7 @@ export async function getProducts() {
 export async function getProductById(id: string) {
 	const product = await prisma.product.findUnique({
 		where: {
-			id,
-			isActive: true
+			id
 		},
 		include: {
 			category: true
@@ -34,7 +33,7 @@ export async function getProductsByCategory(categoryId: string) {
 	const products = await prisma.product.findMany({
 		where: {
 			categoryId,
-			isActive: true
+			status: 'ACTIVE'
 		},
 		include: {
 			category: true
@@ -53,7 +52,7 @@ export async function getCategories() {
 			_count: {
 				select: {
 					products: {
-						where: { isActive: true }
+						where: { status: 'ACTIVE' }
 					}
 				}
 			}

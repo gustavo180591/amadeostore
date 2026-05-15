@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import { getProducts } from '$lib/server/products';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -7,13 +6,35 @@ const prisma = new PrismaClient();
 export const load: PageServerLoad = async () => {
 	try {
 		// Get basic statistics
-		const [productsCount, categoriesCount, recentProducts] = await Promise.all([
+		const [productsCount, categoriesCount] = await Promise.all([
 			prisma.product.count({
 				where: { status: 'ACTIVE' }
 			}),
-			prisma.category.count(),
-			getProducts()
+			prisma.category.count()
 		]);
+
+		// Get recent products with serialized prices
+		const recentProductsData = await prisma.product.findMany({
+			where: { status: 'ACTIVE' },
+			include: {
+				category: {
+					select: {
+						id: true,
+						name: true,
+						slug: true
+					}
+				}
+			},
+			orderBy: { createdAt: 'desc' },
+			take: 5
+		});
+
+		// Serialize prices
+		const recentProducts = recentProductsData.map(product => ({
+			...product,
+			price: Number(product.price),
+			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+		}));
 
 		// Calculate total stock value
 		const products = await prisma.product.findMany({

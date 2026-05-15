@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 export async function load() {
 	try {
 		// Get all products with category info
-		const products = await prisma.product.findMany({
+		const productsData = await prisma.product.findMany({
 			include: {
 				category: {
 					select: {
@@ -19,6 +19,13 @@ export async function load() {
 				createdAt: 'desc'
 			}
 		});
+
+		// Serialize prices for JSON compatibility
+		const products = productsData.map(product => ({
+			...product,
+			price: Number(product.price),
+			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+		}));
 
 		// Get all categories for filters
 		const categories = await prisma.category.findMany({
@@ -40,11 +47,17 @@ export async function load() {
 				.length,
 			featuredProducts: products.filter((p) => p.isFeatured).length,
 			totalValue: products.reduce((sum, product) => {
-				return sum + Number(product.price) * product.stock;
+				return sum + product.price * product.stock;
 			}, 0),
 			lowStockProducts: products.filter((p) => p.stock > 0 && p.stock <= 5).length
 		};
 
+		console.log('Admin products loading:', { 
+			productsCount: products.length, 
+			categoriesCount: categories.length,
+			productsData: products.slice(0, 2) // Log first 2 products for debugging
+		});
+		
 		return {
 			products,
 			categories,

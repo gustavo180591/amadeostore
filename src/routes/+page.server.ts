@@ -44,7 +44,10 @@ export async function load() {
 		// Get active categories
 		const categories = await prisma.category.findMany({
 			where: { isActive: true },
-			orderBy: { sortOrder: 'asc', name: 'asc' },
+			orderBy: [
+				{ sortOrder: 'asc' },
+				{ name: 'asc' }
+			],
 			take: 8
 		});
 
@@ -55,9 +58,18 @@ export async function load() {
 			featuredCount: await prisma.product.count({ where: { isFeatured: true, status: 'ACTIVE' } })
 		};
 
+		// Convert Decimal to number for serialization
+		const serializeProducts = (products: typeof featuredProducts) => {
+			return products.map(product => ({
+				...product,
+				price: Number(product.price),
+				compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+			}));
+		};
+
 		return {
-			featuredProducts,
-			latestProducts,
+			featuredProducts: serializeProducts(featuredProducts),
+			latestProducts: serializeProducts(latestProducts),
 			categories,
 			stats
 		};

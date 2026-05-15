@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { cart } from '$lib/stores/cart';
 
 	const data = $derived($page.data);
 	const featuredProducts = $derived(data?.featuredProducts || []);
@@ -7,6 +8,7 @@
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
 
+	
 	// Format currency
 	const formatCurrency = (amount: number) => {
 		return new Intl.NumberFormat('es-AR', {
@@ -235,8 +237,9 @@
 										<span class="text-xs font-medium text-red-500">¡Últimas unidades!</span>
 									{/if}
 								</div>
-								<button
-									class="mt-4 w-full rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+								<button 
+									onclick={() => cart.addItem(product.id)}
+									class="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
 								>
 									Agregar al Carrito
 								</button>
@@ -347,7 +350,8 @@
 									<span class="text-xs text-gray-500">Stock: {product.stock}</span>
 								</div>
 								<div class="mt-4 flex space-x-2">
-									<button
+									<button 
+										onclick={() => cart.addItem(product.id)}
 										class="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
 									>
 										Agregar al Carrito
@@ -368,33 +372,7 @@
 		</section>
 	{/if}
 
-	<!-- Newsletter Section -->
-	<section class="bg-green-600 py-16">
-		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div class="text-center">
-				<h2 class="text-3xl font-bold text-white">Suscríbete a Nuestro Newsletter</h2>
-				<p class="mt-4 text-lg text-green-100">
-					Recibe las últimas novedades y ofertas exclusivas directamente en tu email
-				</p>
-				<div class="mx-auto mt-8 max-w-md">
-					<form class="flex gap-4">
-						<input
-							type="email"
-							placeholder="Tu email"
-							class="flex-1 rounded-lg border-0 px-4 py-3 focus:ring-2 focus:ring-green-300"
-						/>
-						<button
-							type="submit"
-							class="rounded-lg bg-white px-6 py-3 font-medium text-green-600 transition-colors hover:bg-gray-50"
-						>
-							Suscribirse
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</section>
-
+	
 	<!-- Footer -->
 	<footer class="bg-gray-900 text-white">
 		<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -469,7 +447,7 @@
 			</div>
 
 			<div class="mt-8 border-t border-gray-800 pt-8 text-center text-gray-400">
-				<p>&copy; 2024 AMADEO STORE. Todos los derechos reservados.</p>
+				<p>&copy; 2026 AMADEO STORE. Todos los derechos reservados.</p>
 			</div>
 		</div>
 	</footer>
