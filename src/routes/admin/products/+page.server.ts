@@ -70,7 +70,6 @@ export async function load() {
 			lowStockProducts: products.filter((p) => p.stock > 0 && p.stock <= 5).length
 		};
 
-		
 		return {
 			products,
 			categories,

@@ -89,21 +89,28 @@
 {#if isMobile}
 	<button
 		on:click={toggleSidebar}
-		class="sidebar-toggle fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-md shadow-lg hover:bg-blue-700 transition-colors duration-200"
+		class="sidebar-toggle fixed top-4 left-4 z-50 rounded-md bg-blue-600 p-2 text-white shadow-lg transition-colors duration-200 hover:bg-blue-700"
 	>
 		<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M4 6h16M4 12h16M4 18h16"
+			/>
 		</svg>
 	</button>
 {/if}
 
 <!-- Sidebar -->
 <div
-	class="sidebar fixed left-0 top-0 h-full bg-gray-900 text-white transition-all duration-300 z-40 {sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'} {isMobile ? 'shadow-2xl' : ''}"
+	class="sidebar fixed top-0 left-0 z-40 h-full bg-gray-900 text-white transition-all duration-300 {sidebarOpen
+		? 'w-64'
+		: 'w-0 overflow-hidden'} {isMobile ? 'shadow-2xl' : ''}"
 >
-	<div class="flex flex-col h-full">
+	<div class="flex h-full flex-col">
 		<!-- Sidebar Header -->
-		<div class="flex items-center justify-between p-4 border-b border-gray-700">
+		<div class="flex items-center justify-between border-b border-gray-700 p-4">
 			<div class="flex items-center">
 				<img class="h-8 w-auto" src="/favicon.png" alt="AmadeoStore" />
 				<span class="ml-2 text-lg font-semibold">Admin</span>
@@ -111,18 +118,27 @@
 			{#if isMobile}
 				<button on:click={toggleSidebar} class="text-gray-400 hover:text-white">
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
 					</svg>
 				</button>
 			{/if}
 		</div>
 
 		<!-- Navigation -->
-		<nav class="flex-1 p-4 space-y-2">
+		<nav class="flex-1 space-y-2 p-4">
 			{#each adminNavItems as item}
 				<a
 					href={item.href}
-					class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 {$page.url.pathname.startsWith(item.href) && item.href !== '/admin' ? 'bg-gray-700 text-white' : ''} {$page.url.pathname === item.href ? 'bg-gray-700 text-white' : ''}"
+					class="flex items-center space-x-3 rounded-lg px-3 py-2 text-gray-300 transition-colors duration-200 hover:bg-gray-700 hover:text-white {$page.url.pathname.startsWith(
+						item.href
+					) && item.href !== '/admin'
+						? 'bg-gray-700 text-white'
+						: ''} {$page.url.pathname === item.href ? 'bg-gray-700 text-white' : ''}"
 					on:click={() => {
 						if (isMobile) {
 							sidebarOpen = false;
@@ -138,9 +154,9 @@
 		</nav>
 
 		<!-- Sidebar Footer -->
-		<div class="p-4 border-t border-gray-700">
+		<div class="border-t border-gray-700 p-4">
 			<div class="flex items-center space-x-3 px-3 py-2">
-				<div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+				<div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500">
 					<span class="text-sm font-medium">A</span>
 				</div>
 				<div class="flex-1">
@@ -149,10 +165,16 @@
 				</div>
 			</div>
 			<div class="mt-4 space-y-2">
-				<a href="/" class="block px-3 py-2 text-sm text-gray-300 hover:text-white transition-colors duration-200">
+				<a
+					href="/"
+					class="block px-3 py-2 text-sm text-gray-300 transition-colors duration-200 hover:text-white"
+				>
 					Ver Tienda
 				</a>
-				<a href="/logout" class="block px-3 py-2 text-sm text-gray-300 hover:text-white transition-colors duration-200">
+				<a
+					href="/logout"
+					class="block px-3 py-2 text-sm text-gray-300 transition-colors duration-200 hover:text-white"
+				>
 					Cerrar Sesión
 				</a>
 			</div>
@@ -163,8 +185,8 @@
 <!-- Mobile overlay -->
 {#if isMobile && sidebarOpen}
 	<div
-		class="fixed inset-0 bg-black bg-opacity-50 z-30"
-		on:click={() => sidebarOpen = false}
+		class="bg-opacity-50 fixed inset-0 z-30 bg-black"
+		on:click={() => (sidebarOpen = false)}
 	></div>
 {/if}
 

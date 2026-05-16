@@ -45,7 +45,7 @@
 <!-- Backdrop -->
 {#if isOpen}
 	<div
-		class="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity"
+		class="bg-opacity-50 fixed inset-0 z-50 bg-black transition-opacity"
 		onclick={handleBackdropClick}
 		onkeydown={(e) => e.key === 'Escape' && closeCart()}
 		role="dialog"
@@ -55,7 +55,7 @@
 	>
 		<!-- Cart Drawer -->
 		<div
-			class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out"
+			class="fixed top-0 right-0 h-full w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-in-out"
 			class:translate-x-0={isOpen}
 			class:translate-x-full={!isOpen}
 		>
@@ -118,11 +118,7 @@
 									<!-- Product Image -->
 									<div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
 										{#if item.imageUrl}
-											<img
-												src={item.imageUrl}
-												alt={item.name}
-												class="h-full w-full object-cover"
-											/>
+											<img src={item.imageUrl} alt={item.name} class="h-full w-full object-cover" />
 										{:else}
 											<div class="flex h-full w-full items-center justify-center">
 												<svg
@@ -143,8 +139,8 @@
 									</div>
 
 									<!-- Product Info -->
-									<div class="flex-1 min-w-0">
-										<h4 class="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
+									<div class="min-w-0 flex-1">
+										<h4 class="truncate text-sm font-medium text-gray-900">{item.name}</h4>
 										{#if item.category}
 											<p class="text-xs text-gray-500">{item.category}</p>
 										{/if}
@@ -159,7 +155,12 @@
 											aria-label="Disminuir cantidad"
 										>
 											<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M20 12H4"
+												/>
 											</svg>
 										</button>
 										<span class="w-8 text-center text-sm font-medium">{item.quantity}</span>
@@ -214,7 +215,9 @@
 								class="flex w-full items-center justify-center rounded-lg bg-green-600 px-4 py-3 text-white transition-colors hover:bg-green-700"
 							>
 								<svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-									<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.05-.521-.099-.148-.446-1.075-.612-1.47-.166-.395-.336-.342-.446-.347-.11-.004-.239-.004-.368-.004-.129 0-.347.05-.528.239-.182.19-.698.678-.698 1.652 0 .974.712 1.915.811 2.064.099.148 1.397 2.132 3.383 2.992.473.203.842.324 1.13.415.474.152 0.905.115 1.247.069.38-.051 1.165-.475 1.33-.934.164-.459.164-.85.114-.934-.049-.084-.182-.13-.368-.227zm-6.417 8.096h-.004a9.868 9.868 0 01-5.03-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.435 11.89-11.892 0-3.179-1.235-6.165-3.475-8.413z"/>
+									<path
+										d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.05-.521-.099-.148-.446-1.075-.612-1.47-.166-.395-.336-.342-.446-.347-.11-.004-.239-.004-.368-.004-.129 0-.347.05-.528.239-.182.19-.698.678-.698 1.652 0 .974.712 1.915.811 2.064.099.148 1.397 2.132 3.383 2.992.473.203.842.324 1.13.415.474.152 0.905.115 1.247.069.38-.051 1.165-.475 1.33-.934.164-.459.164-.85.114-.934-.049-.084-.182-.13-.368-.227zm-6.417 8.096h-.004a9.868 9.868 0 01-5.03-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.435 11.89-11.892 0-3.179-1.235-6.165-3.475-8.413z"
+									/>
 								</svg>
 								Pedir por WhatsApp
 							</button>

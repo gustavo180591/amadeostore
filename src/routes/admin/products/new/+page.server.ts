@@ -52,7 +52,7 @@ export const actions = {
 			// Handle uploaded image URLs
 			const uploadedImageUrls = data.getAll('uploadedImageUrls') as string[];
 			const primaryImageIndex = parseInt(data.get('primaryImageIndex') as string) || 0;
-			
+
 			console.log('Images:', { uploadedImageUrls, primaryImageIndex });
 
 			console.log('About to start validation...');
@@ -117,7 +117,9 @@ export const actions = {
 
 			console.log('Stock validation passed, stock value is:', parsedStock);
 
-			console.log('Skipping compare price validation (field removed), proceeding to slug generation...');
+			console.log(
+				'Skipping compare price validation (field removed), proceeding to slug generation...'
+			);
 			// Generate slug if not provided
 			const finalSlug =
 				slug ||
@@ -211,7 +213,7 @@ export const actions = {
 				status,
 				isFeatured
 			});
-			
+
 			const product = await prisma.product.create({
 				data: {
 					name,
@@ -227,7 +229,7 @@ export const actions = {
 					isFeatured
 				}
 			});
-			
+
 			console.log('Product created successfully:', product.id);
 
 			// Process uploaded images
@@ -256,7 +258,7 @@ export const actions = {
 					price: Number(product.price)
 				}
 			};
-			
+
 			console.log('Returning success result:', result);
 			return result;
 		} catch (error) {

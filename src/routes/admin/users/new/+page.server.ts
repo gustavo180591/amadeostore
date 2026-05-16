@@ -23,7 +23,7 @@ export const load: PageServerLoad = async () => {
 			categories: []
 		};
 	}
-}
+};
 
 export const actions: Actions = {
 	create: async ({ request }) => {
@@ -128,7 +128,6 @@ export const actions: Actions = {
 				message: 'Usuario creado exitosamente',
 				user
 			};
-
 		} catch (error) {
 			console.error('Error creating user:', error);
 			return fail(500, {

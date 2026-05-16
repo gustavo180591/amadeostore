@@ -6,7 +6,7 @@ export const load: PageServerLoad = async () => {
 	const categories = await getCategories();
 
 	// Serialize products to convert Decimal to number
-	const serializedProducts = products.map(product => ({
+	const serializedProducts = products.map((product) => ({
 		...product,
 		price: Number(product.price)
 	}));

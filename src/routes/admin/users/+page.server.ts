@@ -40,7 +40,9 @@ export async function load() {
 			newUsersThisMonth: usersData.filter((u) => {
 				const createdAt = new Date(u.createdAt);
 				const now = new Date();
-				return createdAt.getMonth() === now.getMonth() && createdAt.getFullYear() === now.getFullYear();
+				return (
+					createdAt.getMonth() === now.getMonth() && createdAt.getFullYear() === now.getFullYear()
+				);
 			}).length
 		};
 

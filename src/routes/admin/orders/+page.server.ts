@@ -56,15 +56,24 @@ export const load: PageServerLoad = async () => {
 			deliveredOrders: ordersData.filter((o) => o.status === 'DELIVERED').length,
 			cancelledOrders: ordersData.filter((o) => o.status === 'CANCELLED').length,
 			totalRevenue: ordersData.reduce((sum, order) => {
-				return sum + order.orderItems.reduce((itemSum, item) => {
-					return itemSum + (Number(item.price) * item.quantity);
-				}, 0);
+				return (
+					sum +
+					order.orderItems.reduce((itemSum, item) => {
+						return itemSum + Number(item.price) * item.quantity;
+					}, 0)
+				);
 			}, 0),
-			averageOrderValue: totalCount > 0 ? ordersData.reduce((sum, order) => {
-				return sum + order.orderItems.reduce((itemSum, item) => {
-					return itemSum + (Number(item.price) * item.quantity);
-				}, 0);
-			}, 0) / totalCount : 0
+			averageOrderValue:
+				totalCount > 0
+					? ordersData.reduce((sum, order) => {
+							return (
+								sum +
+								order.orderItems.reduce((itemSum, item) => {
+									return itemSum + Number(item.price) * item.quantity;
+								}, 0)
+							);
+						}, 0) / totalCount
+					: 0
 		};
 
 		return {

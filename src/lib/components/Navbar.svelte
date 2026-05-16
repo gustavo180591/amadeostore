@@ -45,24 +45,27 @@
 </script>
 
 <!-- Desktop Navbar -->
-<nav class="bg-white shadow-lg sticky top-0 z-40">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex justify-between h-16">
+<nav class="sticky top-0 z-40 bg-white shadow-lg">
+	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+		<div class="flex h-16 justify-between">
 			<!-- Logo -->
 			<div class="flex items-center">
-				<a href={resolve("/")} class="shrink-0 flex items-center">
+				<a href={resolve('/')} class="flex shrink-0 items-center">
 					<img class="h-8 w-auto" src="/favicon.png" alt="AmadeoStore" />
 					<span class="ml-2 text-xl font-bold text-gray-900">AmadeoStore</span>
 				</a>
 			</div>
 
 			<!-- Desktop Navigation -->
-			<div class="hidden md:flex items-center space-x-8">
+			<div class="hidden items-center space-x-8 md:flex">
 				{#each navItems as item (item.href)}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 					<a
 						href={item.href}
-						class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200 {$page.url.pathname === item.href ? 'text-blue-600 border-b-2 border-blue-600' : ''}"
+						class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-blue-600 {$page
+							.url.pathname === item.href
+							? 'border-b-2 border-blue-600 text-blue-600'
+							: ''}"
 					>
 						{item.name}
 					</a>
@@ -70,44 +73,81 @@
 			</div>
 
 			<!-- Desktop Actions -->
-			<div class="hidden md:flex items-center space-x-4">
+			<div class="hidden items-center space-x-4 md:flex">
 				<!-- Search -->
-				<button class="text-gray-700 hover:text-blue-600 p-2" aria-label="Buscar productos">
+				<button class="p-2 text-gray-700 hover:text-blue-600" aria-label="Buscar productos">
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
 					</svg>
 				</button>
 
 				<!-- User Account -->
-				<a href={resolve("/admin")} class="text-gray-700 hover:text-blue-600 p-2" aria-label="Mi cuenta">
+				<a
+					href={resolve('/admin')}
+					class="p-2 text-gray-700 hover:text-blue-600"
+					aria-label="Mi cuenta"
+				>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+						/>
 					</svg>
 				</a>
 
 				<!-- Cart -->
-				<button onclick={toggleCart} class="relative text-gray-700 hover:text-blue-600 p-2" aria-label="Carrito de compras">
+				<button
+					onclick={toggleCart}
+					class="relative p-2 text-gray-700 hover:text-blue-600"
+					aria-label="Carrito de compras"
+				>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+						/>
 					</svg>
 					{#if cartItemCount > 0}
-						<span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+						<span
+							class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+						>
 							{cartItemCount}
 						</span>
 					{/if}
 				</button>
 
 				<!-- Admin Link -->
-				<a href={resolve("/admin")} class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors duration-200">
+				<a
+					href={resolve('/admin')}
+					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700"
+				>
 					Admin
 				</a>
 			</div>
 
 			<!-- Mobile menu button -->
-			<div class="md:hidden flex items-center">
-				<button onclick={toggleMobileMenu} class="menu-button text-gray-700 hover:text-blue-600 p-2" aria-label="Abrir menú">
+			<div class="flex items-center md:hidden">
+				<button
+					onclick={toggleMobileMenu}
+					class="menu-button p-2 text-gray-700 hover:text-blue-600"
+					aria-label="Abrir menú"
+				>
 					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6h16M4 12h16M4 18h16"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -116,31 +156,46 @@
 
 	<!-- Mobile menu -->
 	{#if mobileMenuOpen}
-		<div class="mobile-menu md:hidden bg-white border-t border-gray-200">
-			<div class="px-2 pt-2 pb-3 space-y-1">
+		<div class="mobile-menu border-t border-gray-200 bg-white md:hidden">
+			<div class="space-y-1 px-2 pt-2 pb-3">
 				{#each navItems as item (item.href)}
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 					<a
 						href={item.href}
-						class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium {$page.url.pathname === item.href ? 'text-blue-600 bg-blue-50' : ''}"
-						onclick={() => mobileMenuOpen = false}
+						class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 {$page
+							.url.pathname === item.href
+							? 'bg-blue-50 text-blue-600'
+							: ''}"
+						onclick={() => (mobileMenuOpen = false)}
 					>
 						{item.name}
 					</a>
 				{/each}
 			</div>
-			<div class="pt-4 pb-3 border-t border-gray-200">
-				<div class="px-2 space-y-1">
-					<a href={resolve("/catalog")} class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+			<div class="border-t border-gray-200 pt-4 pb-3">
+				<div class="space-y-1 px-2">
+					<a
+						href={resolve('/catalog')}
+						class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600"
+					>
 						Búsqueda
 					</a>
-					<a href={resolve("/admin")} class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">
+					<a
+						href={resolve('/admin')}
+						class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600"
+					>
 						Mi Cuenta
 					</a>
-					<button onclick={toggleCart} class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium text-left w-full">
+					<button
+						onclick={toggleCart}
+						class="block w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
+					>
 						Carrito ({cartItemCount})
 					</button>
-					<a href={resolve("/admin")} class="bg-blue-600 text-white block px-3 py-2 text-base font-medium hover:bg-blue-700">
+					<a
+						href={resolve('/admin')}
+						class="block bg-blue-600 px-3 py-2 text-base font-medium text-white hover:bg-blue-700"
+					>
 						Admin
 					</a>
 				</div>

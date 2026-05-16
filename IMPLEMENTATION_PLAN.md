@@ -326,12 +326,12 @@ El store debe permitir:
 
 ```ts
 export type CartItem = {
-  id: string;
-  name: string;
-  price: number;
-  image?: string | null;
-  quantity: number;
-  stock?: number | null;
+	id: string;
+	name: string;
+	price: number;
+	image?: string | null;
+	quantity: number;
+	stock?: number | null;
 };
 ```
 
@@ -340,13 +340,13 @@ export type CartItem = {
 ## Funciones necesarias
 
 ```ts
-addToCart(product)
-removeFromCart(productId)
-increaseQuantity(productId)
-decreaseQuantity(productId)
-clearCart()
-getCartTotal()
-getCartItemsCount()
+addToCart(product);
+removeFromCart(productId);
+increaseQuantity(productId);
+decreaseQuantity(productId);
+clearCart();
+getCartTotal();
+getCartItemsCount();
 ```
 
 ---
@@ -474,8 +474,8 @@ Ejemplo:
 
 ```ts
 export const STORE_CONFIG = {
-  name: 'AmadeoStore',
-  whatsapp: '5490000000000'
+	name: 'AmadeoStore',
+	whatsapp: '5490000000000'
 };
 ```
 

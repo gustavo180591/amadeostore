@@ -10,8 +10,7 @@
 	const latestProducts = $derived(data?.latestProducts || []);
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
-
-	</script>
+</script>
 
 <svelte:head>
 	<title>AMADEO STORE - Tienda Online</title>
@@ -22,7 +21,6 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	
 	<!-- Hero Section -->
 	<section class="bg-linear-to-br from-green-50 to-white py-20">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -196,9 +194,9 @@
 		</div>
 	</footer>
 
-<!-- Cart Drawer Component -->
-<CartDrawer />
+	<!-- Cart Drawer Component -->
+	<CartDrawer />
 
-<!-- Floating WhatsApp Button for mobile -->
-<WhatsAppButton variant="floating" />
+	<!-- Floating WhatsApp Button for mobile -->
+	<WhatsAppButton variant="floating" />
 </div>

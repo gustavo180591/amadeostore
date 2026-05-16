@@ -22,7 +22,6 @@
 		isFeatured: false
 	});
 
-	
 	// Initialize form data when product changes
 	$effect(() => {
 		if (product) {
@@ -111,7 +110,6 @@
 		}
 	};
 
-	
 	// Handle setting primary image
 	const setPrimaryImage = async (imageId: string) => {
 		try {
@@ -244,7 +242,7 @@
 						isSubmitting = true;
 						return async ({ result }) => {
 							isSubmitting = false;
-							
+
 							if (result.type === 'success') {
 								// Product updated successfully
 								alert('Producto actualizado correctamente');
@@ -370,7 +368,6 @@
 							</select>
 						</div>
 
-						
 						<!-- Image Upload -->
 						<div class="sm:col-span-6">
 							<label for="imageUpload" class="block text-sm font-medium text-gray-700">
@@ -423,29 +420,52 @@
 									<h4 class="mb-2 text-sm font-medium text-gray-700">Imágenes actuales</h4>
 									<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 										{#each product.images as image (image.id)}
-											<div class="group relative bg-[#f8f8f8] rounded-xl border border-zinc-200 p-4">
+											<div
+												class="group relative rounded-xl border border-zinc-200 bg-[#f8f8f8] p-4"
+											>
 												<div class="relative flex min-h-[200px] items-center justify-center">
 													<img
 														src={image.url}
 														alt={image.alt || product.name}
 														class="max-h-[180px] w-auto object-contain transition duration-300 group-hover:scale-[1.03]"
 													/>
-												{#if image.isPrimary}
+													{#if image.isPrimary}
+														<div
+															class="absolute top-3 left-3 z-10 rounded-r-md bg-orange-500 px-3 py-1 text-xs font-extrabold tracking-wide text-white uppercase"
+														>
+															Principal
+														</div>
+													{/if}
 													<div
-														class="absolute top-3 left-3 z-10 rounded-r-md px-3 py-1 text-xs font-extrabold uppercase tracking-wide bg-orange-500 text-white"
+														class="absolute top-3 right-3 z-10 flex space-x-1 opacity-0 transition-opacity group-hover:opacity-100"
 													>
-														Principal
-													</div>
-												{/if}
-												<div
-													class="absolute top-3 right-3 z-10 flex space-x-1 opacity-0 transition-opacity group-hover:opacity-100"
-												>
-													{#if !image.isPrimary}
+														{#if !image.isPrimary}
+															<button
+																type="button"
+																onclick={() => setPrimaryImage(image.id)}
+																class="rounded-full bg-blue-500 p-1 text-white transition-colors hover:bg-blue-600"
+																title="Marcar como principal"
+															>
+																<svg
+																	class="h-3 w-3"
+																	fill="none"
+																	stroke="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		stroke-width="2"
+																		d="M5 13l4 4L19 7"
+																	/>
+																</svg>
+															</button>
+														{/if}
 														<button
 															type="button"
-															onclick={() => setPrimaryImage(image.id)}
-															class="rounded-full bg-blue-500 p-1 text-white hover:bg-blue-600 transition-colors"
-															title="Marcar como principal"
+															onclick={() => deleteImage(image.id)}
+															class="rounded-full bg-red-500 p-1 text-white transition-colors hover:bg-red-600"
+															title="Eliminar imagen"
 														>
 															<svg
 																class="h-3 w-3"
@@ -457,34 +477,13 @@
 																	stroke-linecap="round"
 																	stroke-linejoin="round"
 																	stroke-width="2"
-																	d="M5 13l4 4L19 7"
+																	d="M6 18L18 6M6 6l12 12"
 																/>
 															</svg>
 														</button>
-													{/if}
-													<button
-														type="button"
-														onclick={() => deleteImage(image.id)}
-														class="rounded-full bg-red-500 p-1 text-white hover:bg-red-600 transition-colors"
-														title="Eliminar imagen"
-													>
-														<svg
-															class="h-3 w-3"
-															fill="none"
-															stroke="currentColor"
-															viewBox="0 0 24 24"
-														>
-															<path
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="2"
-																d="M6 18L18 6M6 6l12 12"
-															/>
-														</svg>
-													</button>
+													</div>
 												</div>
 											</div>
-										</div>
 										{/each}
 									</div>
 								</div>

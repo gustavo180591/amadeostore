@@ -90,7 +90,9 @@ export async function load() {
 		const stats = {
 			totalProducts: await prisma.product.count({ where: { status: 'PUBLISHED' } }),
 			totalCategories: await prisma.category.count({ where: { isActive: true } }),
-			featuredCount: await prisma.product.count({ where: { isFeatured: true, status: 'PUBLISHED' } })
+			featuredCount: await prisma.product.count({
+				where: { isFeatured: true, status: 'PUBLISHED' }
+			})
 		};
 
 		// Convert Decimal to number for serialization

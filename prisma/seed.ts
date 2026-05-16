@@ -21,7 +21,7 @@ async function main() {
 		{ name: 'Revelado y Laboratorio', slug: 'revelado-y-laboratorio' },
 		{ name: 'Álbumes y Portarretratos', slug: 'albumes-y-portarretratos' },
 		{ name: 'Otros Cámaras', slug: 'otros-camaras' },
-		
+
 		// Celulares y Teléfonos
 		{ name: 'Accesorios para Celulares', slug: 'accesorios-para-celulares' },
 		{ name: 'Celulares y Smartphones', slug: 'celulares-y-smartphones' },
@@ -33,7 +33,7 @@ async function main() {
 		{ name: 'Telefonía Fija e Inalámbrica', slug: 'telefonia-fija-e-inalambrica' },
 		{ name: 'Telefonía IP', slug: 'telefonia-ip' },
 		{ name: 'Otros Celulares', slug: 'otros-celulares' },
-		
+
 		// Computación
 		{ name: 'Accesorios de Antiestática', slug: 'accesorios-de-antiestatica' },
 		{ name: 'Accesorios para PC Gaming', slug: 'accesorios-para-pc-gaming' },
@@ -56,7 +56,7 @@ async function main() {
 		{ name: 'Software', slug: 'software' },
 		{ name: 'Tablets y Accesorios', slug: 'tablets-y-accesorios' },
 		{ name: 'Otros Computación', slug: 'otros-computacion' },
-		
+
 		// Consolas y Videojuegos
 		{ name: 'Accesorios para Consolas', slug: 'accesorios-para-consolas' },
 		{ name: 'Accesorios para PC Gaming', slug: 'accesorios-para-pc-gaming-consolas' },
@@ -65,7 +65,7 @@ async function main() {
 		{ name: 'Repuestos para Consolas', slug: 'repuestos-para-consolas' },
 		{ name: 'Videojuegos', slug: 'videojuegos' },
 		{ name: 'Otros Videojuegos', slug: 'otros-videojuegos' },
-		
+
 		// Electrónica, Audio y Video
 		{ name: 'Accesorios para Audio y Video', slug: 'accesorios-para-audio-y-video' },
 		{ name: 'Accesorios para TV', slug: 'accesorios-para-tv' },
@@ -85,7 +85,7 @@ async function main() {
 	];
 
 	const categories = await Promise.all(
-		categoryData.map(category =>
+		categoryData.map((category) =>
 			prisma.category.upsert({
 				where: { slug: category.slug },
 				update: {},
@@ -97,9 +97,13 @@ async function main() {
 	console.log(`Created ${categories.length} categories`);
 
 	// Create sample products
-	const smartphones = categories.find((c: { slug: string }) => c.slug === 'celulares-y-smartphones');
+	const smartphones = categories.find(
+		(c: { slug: string }) => c.slug === 'celulares-y-smartphones'
+	);
 	const notebooks = categories.find((c: { slug: string }) => c.slug === 'notebooks-y-accesorios');
-	const accesorios = categories.find((c: { slug: string }) => c.slug === 'accesorios-para-celulares');
+	const accesorios = categories.find(
+		(c: { slug: string }) => c.slug === 'accesorios-para-celulares'
+	);
 	const tablets = categories.find((c: { slug: string }) => c.slug === 'tablets-y-ipads');
 
 	// Create products using slug as unique identifier

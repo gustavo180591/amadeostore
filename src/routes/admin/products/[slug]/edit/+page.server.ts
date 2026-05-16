@@ -78,11 +78,11 @@ export const actions = {
 
 			// Validar status con valores seguros
 			const rawStatus = formData.get('status');
-			const status = 
-				(rawStatus === 'PUBLISHED' || 
-				 rawStatus === 'DRAFT' || 
-				 rawStatus === 'OUT_OF_STOCK' || 
-				 rawStatus === 'ARCHIVED')
+			const status =
+				rawStatus === 'PUBLISHED' ||
+				rawStatus === 'DRAFT' ||
+				rawStatus === 'OUT_OF_STOCK' ||
+				rawStatus === 'ARCHIVED'
 					? rawStatus
 					: 'DRAFT';
 
@@ -135,7 +135,7 @@ export const actions = {
 
 			// Update product - try by slug first, then by ID
 			let updatedProduct;
-			
+
 			try {
 				// Try by slug first
 				updatedProduct = await prisma.product.update({

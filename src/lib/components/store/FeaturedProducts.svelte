@@ -15,7 +15,10 @@
 		isFeatured?: boolean;
 	};
 
-	let { products = [], title = 'Productos destacados' }: { products: FeaturedProduct[]; title: string } = $props();
+	let {
+		products = [],
+		title = 'Productos destacados'
+	}: { products: FeaturedProduct[]; title: string } = $props();
 </script>
 
 <section class="bg-[#f2f2f2] py-10">

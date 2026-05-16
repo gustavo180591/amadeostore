@@ -46,7 +46,9 @@
 	<div class="relative flex min-h-[280px] items-center justify-center bg-[#f8f8f8] p-6">
 		{#if product.badge}
 			<div
-				class="absolute left-0 top-3 z-10 rounded-r-md px-3 py-1 text-xs font-extrabold uppercase tracking-wide {badgeClasses(product.badgeColor)}"
+				class="absolute top-3 left-0 z-10 rounded-r-md px-3 py-1 text-xs font-extrabold tracking-wide uppercase {badgeClasses(
+					product.badgeColor
+				)}"
 			>
 				{product.badge}
 			</div>
@@ -54,9 +56,9 @@
 
 		{#if product.discount}
 			<div
-				class="absolute left-4 top-12 z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-cyan-500 text-white shadow-md"
+				class="absolute top-12 left-4 z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full bg-cyan-500 text-white shadow-md"
 			>
-				<span class="text-3xl font-extrabold leading-none">{product.discount}</span>
+				<span class="text-3xl leading-none font-extrabold">{product.discount}</span>
 				<span class="-mt-1 text-xs font-bold">% OFF</span>
 			</div>
 		{/if}
@@ -69,14 +71,14 @@
 	</div>
 
 	<div class="flex flex-1 flex-col p-4">
-		<h3 class="min-h-[64px] text-[1.05rem] font-extrabold leading-tight text-zinc-900">
+		<h3 class="min-h-[64px] text-[1.05rem] leading-tight font-extrabold text-zinc-900">
 			{product.name}
 		</h3>
 
 		<div class="mt-3 text-sm text-zinc-500">Desde</div>
 
 		<div class="flex items-end gap-2">
-			<span class="text-[2rem] font-extrabold leading-none text-green-600">
+			<span class="text-[2rem] leading-none font-extrabold text-green-600">
 				{formatPrice(product.price)}
 			</span>
 
@@ -87,12 +89,12 @@
 			{/if}
 		</div>
 
-		<div class="mt-1 text-xs uppercase text-zinc-400">
+		<div class="mt-1 text-xs text-zinc-400 uppercase">
 			PRECIO SIN IMPUESTOS {formatPrice(taxFreePrice)}
 		</div>
 
 		{#if product.promoText}
-			<div class="mt-3 text-sm font-extrabold uppercase text-cyan-600">
+			<div class="mt-3 text-sm font-extrabold text-cyan-600 uppercase">
 				{product.promoText}
 			</div>
 		{/if}

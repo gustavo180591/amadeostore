@@ -70,14 +70,17 @@ function createCartStore() {
 		update,
 
 		// Add item to cart
-		addItem: (product: {
-			id: string;
-			name: string;
-			price: number;
-			imageUrl?: string;
-			category?: string;
-			sku?: string;
-		}, quantity: number = 1) => {
+		addItem: (
+			product: {
+				id: string;
+				name: string;
+				price: number;
+				imageUrl?: string;
+				category?: string;
+				sku?: string;
+			},
+			quantity: number = 1
+		) => {
 			update((cart) => {
 				const existingItem = cart.items.find((item) => item.id === product.id);
 
@@ -88,9 +91,7 @@ function createCartStore() {
 				if (existingItem) {
 					// Update quantity of existing item
 					newItems = cart.items.map((item) =>
-						item.id === product.id
-							? { ...item, quantity: item.quantity + quantity }
-							: item
+						item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
 					);
 					newCount = cart.count + quantity;
 					newTotal = cart.total + product.price * quantity;
@@ -199,7 +200,7 @@ function createCartStore() {
 		}) => {
 			return new Promise<string>((resolve) => {
 				let message = 'Hola, quiero hacer el siguiente pedido en Amadeo Store:\n\n';
-				
+
 				// Get current cart state
 				const unsubscribe = subscribe((currentCart) => {
 					unsubscribe();
@@ -240,7 +241,7 @@ function createCartStore() {
 			const message = await cart.generateWhatsAppMessage(customerInfo);
 			const encodedMessage = encodeURIComponent(message);
 			const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/[^\d]/g, '')}?text=${encodedMessage}`;
-			
+
 			if (browser) {
 				window.open(whatsappUrl, '_blank');
 			}
