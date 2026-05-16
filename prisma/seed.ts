@@ -209,6 +209,97 @@ async function main() {
 
 	console.log(`${products.length} products created`);
 
+	// Create variants for iPhone 15 Pro
+	const iPhoneProduct = await prisma.product.findUnique({
+		where: { slug: 'iphone-15-pro' }
+	});
+
+	if (iPhoneProduct) {
+		const variants = [
+			{
+				colorName: 'Titanio Azul',
+				colorHex: '#3F4A56',
+				storage: '128 GB',
+				sku: 'IP15PRO-AZUL-128',
+				price: 1200000,
+				oldPrice: 1350000,
+				stock: 3,
+				isDefault: true
+			},
+			{
+				colorName: 'Titanio Azul',
+				colorHex: '#3F4A56',
+				storage: '256 GB',
+				sku: 'IP15PRO-AZUL-256',
+				price: 1350000,
+				oldPrice: 1500000,
+				stock: 2,
+				isDefault: false
+			},
+			{
+				colorName: 'Titanio Negro',
+				colorHex: '#242424',
+				storage: '128 GB',
+				sku: 'IP15PRO-NEGRO-128',
+				price: 1200000,
+				oldPrice: 1350000,
+				stock: 5,
+				isDefault: false
+			},
+			{
+				colorName: 'Titanio Negro',
+				colorHex: '#242424',
+				storage: '256 GB',
+				sku: 'IP15PRO-NEGRO-256',
+				price: 1350000,
+				oldPrice: 1500000,
+				stock: 1,
+				isDefault: false
+			},
+			{
+				colorName: 'Titanio Natural',
+				colorHex: '#B9B2A8',
+				storage: '128 GB',
+				sku: 'IP15PRO-NAT-128',
+				price: 1200000,
+				oldPrice: 1350000,
+				stock: 4,
+				isDefault: false
+			},
+			{
+				colorName: 'Titanio Natural',
+				colorHex: '#B9B2A8',
+				storage: '256 GB',
+				sku: 'IP15PRO-NAT-256',
+				price: 1350000,
+				oldPrice: 1500000,
+				stock: 2,
+				isDefault: false
+			}
+		];
+
+		for (const variantData of variants) {
+			const variant = await prisma.productVariant.create({
+				data: {
+					productId: iPhoneProduct.id,
+					...variantData
+				}
+			});
+
+			// Add variant images (using same images for all variants for demo)
+			await prisma.productVariantImage.create({
+				data: {
+					variantId: variant.id,
+					url: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=80',
+					alt: `${iPhoneProduct.name} - ${variantData.colorName} ${variantData.storage}`,
+					sortOrder: 0
+				}
+			});
+		}
+
+		console.log('iPhone 15 Pro variants created');
+	}
+
 	// Create default admin user
 	const adminExists = await prisma.user.findUnique({
 		where: { email: 'admin@amadeostore.com' }

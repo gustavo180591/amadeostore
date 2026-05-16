@@ -42,10 +42,13 @@ export const actions = {
 			const slug = data.get('slug') as string;
 			const description = data.get('description') as string;
 			const price = data.get('price') as string;
+			const oldPrice = data.get('oldPrice') as string;
 			const stock = data.get('stock') as string;
 			const categoryId = data.get('categoryId') as string;
 			const status = data.get('status') as string;
 			const isFeatured = data.get('isFeatured') === 'on';
+			const badge = data.get('badge') as string;
+			const promoText = data.get('promoText') as string;
 
 			console.log('Extracted form data:', { name, price, stock, status });
 
@@ -95,7 +98,31 @@ export const actions = {
 				});
 			}
 
-			console.log('Price validation passed, proceeding to stock validation...');
+			console.log('Price validation passed, proceeding to oldPrice validation...');
+			// Old price validation (optional)
+			let parsedOldPrice = null;
+			if (oldPrice) {
+				parsedOldPrice = parseFloat(oldPrice);
+				if (isNaN(parsedOldPrice) || parsedOldPrice < 0) {
+					return fail(400, {
+						error: 'El precio anterior debe ser un número válido mayor o igual a 0',
+						data: {
+							name,
+							sku,
+							slug,
+							description,
+							price,
+							oldPrice,
+							stock,
+							categoryId,
+							status,
+							isFeatured
+						}
+					});
+				}
+			}
+
+			console.log('Old price validation passed, proceeding to stock validation...');
 			// Stock validation
 			const parsedStock = parseInt(stock);
 			if (isNaN(parsedStock) || parsedStock < 0) {
@@ -107,6 +134,7 @@ export const actions = {
 						slug,
 						description,
 						price,
+						oldPrice,
 						stock,
 						categoryId,
 						status,
@@ -223,11 +251,14 @@ export const actions = {
 					slug: finalSlug,
 					description: description || null,
 					price: parsedPrice,
+					oldPrice: parsedOldPrice,
 					stock: parsedStock,
 					categoryId: categoryId || null,
 					status: status as 'DRAFT' | 'PUBLISHED' | 'OUT_OF_STOCK' | 'ARCHIVED',
-					isFeatured
-				}
+					isFeatured,
+					badge: badge || null,
+					promoText: promoText || null
+				} as any
 			});
 
 			console.log('Product created successfully:', product.id);

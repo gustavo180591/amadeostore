@@ -95,11 +95,14 @@ model Product {
   brand          String?
   model          String?
   description    String?
-  price          Decimal        @db.Decimal(10, 2)
-  stock          Int            @default(0)
-  sku            String?        @unique
-  imageUrl       String?
+  price          Decimal?       @db.Decimal(10, 2)  // Optional for compatibility
+  oldPrice       Decimal?       @db.Decimal(10, 2)  // Optional for compatibility
+  stock          Int            @default(0)         // Optional for compatibility
+  sku            String?        @unique             // Optional for compatibility
+  imageUrl       String?                            // Optional for compatibility
   specs          Json?
+  badge          String?
+  promoText      String?
   status         ProductStatus  @default(DRAFT)
   isFeatured     Boolean        @default(false)
   categoryId     String?
@@ -109,6 +112,7 @@ model Product {
   orderItems     OrderItem[]
   category       Category?      @relation(fields: [categoryId], references: [id])
   images         ProductImage[]
+  variants       ProductVariant[]
 
   @@index([categoryId])
   @@index([status])
@@ -175,4 +179,46 @@ enum PaymentMethod {
 enum DeliveryMethod {
   PICKUP
   DELIVERY
+}
+
+model ProductVariant {
+  id          String   @id @default(cuid())
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  colorName   String?
+  colorHex    String?
+  storage     String?
+  ram         String?
+
+  sku         String?  @unique
+  price       Decimal  @db.Decimal(10, 2)
+  oldPrice    Decimal? @db.Decimal(10, 2)
+  stock       Int      @default(0)
+
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+
+  images      ProductVariantImage[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductVariantImage {
+  id          String         @id @default(cuid())
+
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  url         String
+  alt         String?
+  sortOrder   Int            @default(0)
+
+  createdAt   DateTime       @default(now())
+
+  @@index([variantId])
 }

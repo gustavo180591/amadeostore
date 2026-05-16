@@ -315,6 +315,26 @@
 					</div>
 
 					<div>
+						<label for="oldPrice" class="mb-2 block text-sm font-medium text-gray-700">
+							Precio Anterior
+						</label>
+						<div class="relative">
+							<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+								<span class="text-gray-500 sm:text-sm">$</span>
+							</div>
+							<input
+								id="oldPrice"
+								name="oldPrice"
+								type="number"
+								step="0.01"
+								min="0"
+								class="block w-full rounded-lg border border-gray-300 px-3 py-2 pl-7 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
+								placeholder="0.00"
+							/>
+						</div>
+					</div>
+
+					<div>
 						<label for="stock" class="mb-2 block text-sm font-medium text-gray-700">
 							Stock <span class="text-red-500">*</span>
 						</label>
@@ -326,6 +346,35 @@
 							required
 							class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
 							placeholder="0"
+						/>
+					</div>
+
+					<div>
+						<label for="badge" class="mb-2 block text-sm font-medium text-gray-700">
+							Badge
+						</label>
+						<input
+							id="badge"
+							name="badge"
+							type="text"
+							class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
+							placeholder="Ej: Más vendidos, Nuevo, Oferta"
+						/>
+					</div>
+				</div>
+
+				<!-- Marketing Text -->
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-1">
+					<div>
+						<label for="promoText" class="mb-2 block text-sm font-medium text-gray-700">
+							Texto Promocional
+						</label>
+						<input
+							id="promoText"
+							name="promoText"
+							type="text"
+							class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
+							placeholder="Ej: +20% OFF EN 1 PAGO + ENVÍO GRATIS"
 						/>
 					</div>
 				</div>

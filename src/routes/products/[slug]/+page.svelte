@@ -1,11 +1,67 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { ChevronRight, ChevronLeft, Check, CreditCard, Home, Store } from '@lucide/svelte';
 
 	const data = $derived($page.data);
 	const product = $derived(data?.product);
+	const selectedVariant = $derived(data?.selectedVariant);
 
-	let selectedImage = $state(product?.images?.[0]?.url || product?.imageUrl || '/images/placeholder-product.png');
+	// Get available colors from variants
+	const colors = $derived(() => {
+		if (!product?.variants?.length) return [];
+		
+		const uniqueColors = Array.from(
+			new Map(
+				product.variants
+					.filter((variant: any) => variant.colorName)
+					.map((variant: any) => [
+						variant.colorName,
+						{
+							name: variant.colorName,
+							hex: variant.colorHex || '#000000'
+						}
+					])
+			).values()
+		);
+		return uniqueColors as { name: string; hex: string }[];
+	});
+
+	// Get available storages from variants
+	const storages = $derived(() => {
+		if (!product?.variants?.length) return [];
+		
+		return Array.from(
+			new Set(
+				product.variants
+					.map((variant: any) => variant.storage)
+					.filter(Boolean)
+			)
+		) as string[];
+	});
+
+	// Get images for selected variant or fallback to product images
+	const images = $derived(() => {
+		if (selectedVariant?.images?.length) {
+			return selectedVariant.images;
+		}
+		return product?.images || [];
+	});
+
+	// Selected image state
+	let selectedImage = $state('/images/placeholder-product.png');
+
+	// Update selected image when variant changes
+	$effect(() => {
+		const currentImages = images();
+		if (currentImages.length > 0) {
+			selectedImage = currentImages[0].url;
+		} else if (product?.imageUrl) {
+			selectedImage = product.imageUrl;
+		} else {
+			selectedImage = '/images/placeholder-product.png';
+		}
+	});
 
 	const formatPrice = (value: number) =>
 		new Intl.NumberFormat('es-AR', {
@@ -14,37 +70,58 @@
 			maximumFractionDigits: 0
 		}).format(value);
 
-	const taxFreePrice = Math.round(Number(product?.price) / 1.21);
+	// Calculate discount from variant
+	const discount = $derived(() => {
+		if (!selectedVariant) return 0;
+		if (!selectedVariant.oldPrice) return 0;
+		return Math.round(((Number(selectedVariant.oldPrice) - Number(selectedVariant.price)) / Number(selectedVariant.oldPrice)) * 100);
+	});
 
-	const oldPrice = product?.oldPrice ? Number(product.oldPrice) : null;
-	const discount = product?.discount || 20;
+	const taxFreePrice = $derived(() => {
+		if (!selectedVariant) return 0;
+		return Math.round(Number(selectedVariant.price) / 1.21);
+	});
 
-	const colors = [
-		{
-			name: 'Pantone Sunrise Orange',
-			class: 'bg-orange-500'
-		},
-		{
-			name: 'Gris',
-			class: 'bg-slate-600'
-		},
-		{
-			name: 'Verde',
-			class: 'bg-emerald-700'
+	// Find variant by color and storage
+	function findVariant(colorName: string | null, storage: string | null) {
+		if (!product?.variants?.length) return null;
+		
+		return product.variants.find((variant: any) => {
+			const sameColor = colorName ? variant.colorName === colorName : true;
+			const sameStorage = storage ? variant.storage === storage : true;
+			return sameColor && sameStorage;
+		});
+	}
+
+	// Handle color selection
+	function selectColor(colorName: string) {
+		const variant = findVariant(colorName, selectedVariant?.storage || null);
+		if (variant) {
+			goto(`?variant=${variant.id}`, { replaceState: true, noScroll: true });
 		}
-	];
+	}
 
-	const memories = ['128 GB', '256 GB'];
-
-	let selectedColor = $state(colors[0].name);
-	let selectedMemory = $state(memories[0]);
+	// Handle storage selection
+	function selectStorage(storage: string) {
+		const variant = findVariant(selectedVariant?.colorName || null, storage);
+		if (variant) {
+			goto(`?variant=${variant.id}`, { replaceState: true, noScroll: true });
+		}
+	}
 
 	function goBack() {
 		history.back();
 	}
 
 	function handleBuy() {
-		const message = `Hola Amadeo Store, quiero consultar por el producto: ${product?.name}`;
+		const message = `Hola Amadeo Store, quiero consultar por este producto:
+
+Producto: ${product?.name}
+${selectedVariant?.colorName ? `Color: ${selectedVariant.colorName}` : ''}
+${selectedVariant?.storage ? `Memoria: ${selectedVariant.storage}` : ''}
+Precio: ${formatPrice(Number(selectedVariant?.price || 0))}
+${selectedVariant?.sku ? `Código: ${selectedVariant.sku}` : ''}`;
+
 		const phone = '5493760000000';
 		window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
 	}
@@ -160,77 +237,82 @@
 
 						<div class="mt-5 flex items-end gap-3">
 							<span class="text-4xl font-light text-red-600">
-								{formatPrice(Number(product.price))}
+								{formatPrice(Number(selectedVariant?.price || product?.price || 0))}
 							</span>
 
-							{#if oldPrice}
+							{#if selectedVariant?.oldPrice}
 								<span class="pb-2 text-lg text-zinc-400 line-through">
-									{formatPrice(oldPrice)}
+									{formatPrice(Number(selectedVariant.oldPrice))}
 								</span>
 							{/if}
 						</div>
 
 						<p class="mt-1 text-xs uppercase text-zinc-400">
-							Precio sin impuestos {formatPrice(taxFreePrice)}
+							Precio sin impuestos {formatPrice(taxFreePrice())}
 						</p>
 
 						<p class="mt-5 text-base font-extrabold uppercase text-cyan-600">
-							+20% OFF EN 1 PAGO + ENVÍO GRATIS
+							{product?.promoText || '+20% OFF EN 1 PAGO + ENVÍO GRATIS'}
 						</p>
 
-						<div class="mt-6">
-							<p class="text-base text-zinc-900">
-								Color:
-								<strong>{selectedColor}</strong>
-							</p>
+						{#if colors().length > 0}
+							<div class="mt-6">
+								<p class="text-base text-zinc-900">
+									Color:
+									<strong>{selectedVariant?.colorName || 'Seleccionar'}</strong>
+								</p>
 
-							<div class="mt-3 flex gap-3">
-								{#each colors as color}
-									<button
-										type="button"
-										aria-label={color.name}
-										onclick={() => (selectedColor = color.name)}
-										class={`h-9 w-9 rounded-full border-2 shadow-md transition ${color.class} ${
-											selectedColor === color.name
-												? 'border-cyan-500 ring-2 ring-cyan-200'
-												: 'border-white'
-										}`}
-									></button>
-								{/each}
+								<div class="mt-3 flex gap-3">
+									{#each colors() as color (color.name)}
+										<button
+											type="button"
+											aria-label={color.name}
+											onclick={() => selectColor(color.name)}
+											class={`h-9 w-9 rounded-full border-2 shadow-md transition ${
+												selectedVariant?.colorName === color.name
+													? 'border-cyan-500 ring-2 ring-cyan-200'
+													: 'border-white'
+											}`}
+											style={`background-color: ${color.hex}`}
+										></button>
+									{/each}
+								</div>
 							</div>
-						</div>
+						{/if}
 
-						<div class="mt-6">
-							<p class="text-base text-zinc-900">
-								Memoria:
-								<strong>{selectedMemory}</strong>
-							</p>
+						{#if storages().length > 0}
+							<div class="mt-6">
+								<p class="text-base text-zinc-900">
+									Memoria:
+									<strong>{selectedVariant?.storage || 'Seleccionar'}</strong>
+								</p>
 
-							<div class="mt-3 flex gap-2">
-								{#each memories as memory}
-									<button
-										type="button"
-										onclick={() => (selectedMemory = memory)}
-										class={`rounded-md border px-4 py-3 text-sm font-bold transition ${
-											selectedMemory === memory
-												? 'border-cyan-600 bg-cyan-600 text-white'
-												: 'border-zinc-300 bg-white text-zinc-800 hover:border-cyan-500'
-										}`}
-									>
-										{memory}
-									</button>
-								{/each}
+								<div class="mt-3 flex gap-2">
+									{#each storages() as storage (storage)}
+										<button
+											type="button"
+											onclick={() => selectStorage(storage)}
+											class={`rounded-md border px-4 py-3 text-sm font-bold transition ${
+												selectedVariant?.storage === storage
+													? 'border-cyan-600 bg-cyan-600 text-white'
+													: 'border-zinc-300 bg-white text-zinc-800 hover:border-cyan-500'
+											}`}
+										>
+											{storage}
+										</button>
+									{/each}
+								</div>
 							</div>
-						</div>
+						{/if}
 
 						<p class="mt-5 text-xs text-zinc-400">
-							Código: {product.sku || product.id.slice(0, 8)}
+							Código: {selectedVariant?.sku || product?.sku || product?.id?.slice(0, 8)}
 						</p>
 
 						<button
 							type="button"
 							onclick={handleBuy}
-							disabled={product.stock <= 0}
+							disabled={(selectedVariant?.stock || product?.stock || 0) <= 0}
 							class="mt-6 flex w-full items-center justify-center rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-zinc-300"
 						>
 							Consultar por WhatsApp
