@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 export async function load({ params }) {
 	try {
-		// Get product by slug
-		const productData = await prisma.product.findUnique({
+		// First try to find by slug, then by ID (handle both cases)
+		let productData = await prisma.product.findUnique({
 			where: { slug: params.slug },
 			include: {
 				category: true,
@@ -15,6 +15,19 @@ export async function load({ params }) {
 				}
 			}
 		});
+
+		// If not found by slug, try by ID
+		if (!productData) {
+			productData = await prisma.product.findUnique({
+				where: { id: params.slug },
+				include: {
+					category: true,
+					images: {
+						orderBy: { sortOrder: 'asc' }
+					}
+				}
+			});
+		}
 
 		if (!productData) {
 			throw fail(404, {
@@ -25,8 +38,7 @@ export async function load({ params }) {
 		// Serialize product for JSON compatibility
 		const product = {
 			...productData,
-			price: Number(productData.price),
-			compareAtPrice: productData.compareAtPrice ? Number(productData.compareAtPrice) : null
+			price: Number(productData.price)
 		};
 
 		// Get all categories for dropdown
@@ -50,18 +62,31 @@ export async function load({ params }) {
 export const actions = {
 	update: async ({ request, params }) => {
 		try {
+			console.log('=== PRODUCT UPDATE DEBUG ===');
+			console.log('Update action called with params:', params);
 			const formData = await request.formData();
+			console.log('Form data received:', Object.fromEntries(formData.entries()));
 
 			const name = formData.get('name') as string;
 			const description = formData.get('description') as string;
 			const price = formData.get('price') as string;
-			const compareAtPrice = formData.get('compareAtPrice') as string;
 			const stock = formData.get('stock') as string;
 			const sku = formData.get('sku') as string;
 			const imageUrl = formData.get('imageUrl') as string;
-			const categoryId = formData.get('categoryId') as string;
-			const status = formData.get('status') as string;
+			const categoryId = formData.get('categoryId')?.toString() || null;
 			const isFeatured = formData.get('isFeatured') === 'true';
+
+			// Validar status con valores seguros
+			const rawStatus = formData.get('status');
+			const status = 
+				(rawStatus === 'PUBLISHED' || 
+				 rawStatus === 'DRAFT' || 
+				 rawStatus === 'OUT_OF_STOCK' || 
+				 rawStatus === 'ARCHIVED')
+					? rawStatus
+					: 'DRAFT';
+
+			console.log('Processed form data:', { name, price, stock, status, categoryId, isFeatured });
 
 			// Validation
 			if (!name || !price || !stock) {
@@ -71,7 +96,6 @@ export const actions = {
 						name,
 						description,
 						price,
-						compareAtPrice,
 						stock,
 						sku,
 						imageUrl,
@@ -98,7 +122,6 @@ export const actions = {
 							name,
 							description,
 							price,
-							compareAtPrice,
 							stock,
 							sku,
 							imageUrl,
@@ -110,35 +133,63 @@ export const actions = {
 				}
 			}
 
-			// Update product
-			const updatedProduct = await prisma.product.update({
-				where: { slug: params.slug },
-				data: {
-					name,
-					description: description || null,
-					price: parseFloat(price),
-					compareAtPrice: compareAtPrice ? parseFloat(compareAtPrice) : null,
-					stock: parseInt(stock),
-					sku: sku || null,
-					imageUrl: imageUrl || null,
-					categoryId: categoryId || null,
-					status: status as 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
-					isFeatured
-				},
-				include: {
-					category: true,
-					images: {
-						orderBy: { sortOrder: 'asc' }
+			// Update product - try by slug first, then by ID
+			let updatedProduct;
+			
+			try {
+				// Try by slug first
+				updatedProduct = await prisma.product.update({
+					where: { slug: params.slug },
+					data: {
+						name,
+						description: description || null,
+						price: parseFloat(price),
+						stock: parseInt(stock),
+						sku: sku || null,
+						imageUrl: imageUrl || null,
+						categoryId,
+						status,
+						isFeatured
+					},
+					include: {
+						category: true,
+						images: {
+							orderBy: { sortOrder: 'asc' }
+						}
 					}
-				}
-			});
+				});
+			} catch (error) {
+				// If slug fails, try by ID
+				updatedProduct = await prisma.product.update({
+					where: { id: params.slug },
+					data: {
+						name,
+						description: description || null,
+						price: parseFloat(price),
+						stock: parseInt(stock),
+						sku: sku || null,
+						imageUrl: imageUrl || null,
+						categoryId,
+						status,
+						isFeatured
+					},
+					include: {
+						category: true,
+						images: {
+							orderBy: { sortOrder: 'asc' }
+						}
+					}
+				});
+			}
 
 			// Serialize for JSON compatibility
 			const serializedProduct = {
 				...updatedProduct,
-				price: Number(updatedProduct.price),
-				compareAtPrice: updatedProduct.compareAtPrice ? Number(updatedProduct.compareAtPrice) : null
+				price: Number(updatedProduct.price)
 			};
+
+			console.log('Product updated successfully:', serializedProduct);
+			console.log('=== END PRODUCT UPDATE DEBUG ===');
 
 			return {
 				success: true,

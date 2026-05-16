@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type Product, type Category, type ProductImage } from '@prisma/client';
 import { error } from '@sveltejs/kit';
 
 const prisma = new PrismaClient();
@@ -28,7 +28,7 @@ export async function load({ params }) {
 			throw error(404, 'Product not found');
 		}
 
-		if (product.status !== 'ACTIVE') {
+		if (product.status !== 'PUBLISHED') {
 			throw error(404, 'Product not available');
 		}
 
@@ -37,7 +37,7 @@ export async function load({ params }) {
 			where: {
 				categoryId: product.categoryId,
 				id: { not: product.id },
-				status: 'ACTIVE'
+				status: 'PUBLISHED'
 			},
 			include: {
 				category: {
@@ -57,8 +57,7 @@ export async function load({ params }) {
 			product: Product & { category: Category | null; images: ProductImage[] }
 		) => ({
 			...product,
-			price: Number(product.price),
-			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+			price: Number(product.price)
 		});
 
 		const serializeProducts = (

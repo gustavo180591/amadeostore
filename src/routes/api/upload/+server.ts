@@ -11,7 +11,7 @@ export async function POST({ request }) {
 			return error(400, 'No se proporcionó ningún archivo');
 		}
 
-		const result = await uploadProductImage(file, productId);
+		const result = await uploadProductImage(file, productId || undefined);
 
 		if (result.success) {
 			return json(result);

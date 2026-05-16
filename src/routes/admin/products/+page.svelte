@@ -12,24 +12,9 @@
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
 
-	// Debug: Log data to console
-	$effect(() => {
-		console.log('Page data:', data);
-		console.log('Products:', products);
-		console.log('Products length:', products.length);
-	});
-
 	// Filter products based on search and filters
 	const filteredProducts = $derived(() => {
 		let result = [...products];
-
-		// Debug: Log filtering process
-		console.log('Filtering products:', {
-			initialCount: result.length,
-			searchQuery,
-			selectedStatus,
-			selectedCategory
-		});
 
 		// Search filter
 		if (searchQuery.trim()) {
@@ -504,7 +489,13 @@
 									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="flex items-center">
 											<div class="h-10 w-10 shrink-0">
-												{#if product.imageUrl}
+												{#if product.images && product.images.length > 0}
+													<img
+														class="h-10 w-10 rounded-lg object-cover"
+														src={product.images[0].url}
+														alt={product.name}
+													/>
+												{:else if product.imageUrl}
 													<img
 														class="h-10 w-10 rounded-lg object-cover"
 														src={product.imageUrl}

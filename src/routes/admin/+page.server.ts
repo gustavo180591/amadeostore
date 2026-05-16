@@ -8,14 +8,14 @@ export const load: PageServerLoad = async () => {
 		// Get basic statistics
 		const [productsCount, categoriesCount] = await Promise.all([
 			prisma.product.count({
-				where: { status: 'ACTIVE' }
+				where: { status: 'PUBLISHED' }
 			}),
 			prisma.category.count()
 		]);
 
 		// Get recent products with serialized prices
 		const recentProductsData = await prisma.product.findMany({
-			where: { status: 'ACTIVE' },
+			where: { status: 'PUBLISHED' },
 			include: {
 				category: {
 					select: {
@@ -32,13 +32,12 @@ export const load: PageServerLoad = async () => {
 		// Serialize prices
 		const recentProducts = recentProductsData.map((product) => ({
 			...product,
-			price: Number(product.price),
-			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+			price: Number(product.price)
 		}));
 
 		// Calculate total stock value
 		const products = await prisma.product.findMany({
-			where: { status: 'ACTIVE' },
+			where: { status: 'PUBLISHED' },
 			select: {
 				price: true,
 				stock: true
@@ -52,7 +51,7 @@ export const load: PageServerLoad = async () => {
 		// Get low stock products
 		const lowStockProducts = await prisma.product.findMany({
 			where: {
-				status: 'ACTIVE',
+				status: 'PUBLISHED',
 				stock: {
 					lt: 5
 				}

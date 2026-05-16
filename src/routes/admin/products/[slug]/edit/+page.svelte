@@ -6,37 +6,38 @@
 	let { data, form } = $props();
 
 	// Use state for reactive data (accepting the warnings for functionality)
-	let product = $derived(data.product);
-	let categories = $derived(data.categories);
+	let product = $derived(data?.product);
+	let categories = $derived(data?.categories || []);
 
 	// Form state - reactive state that updates with product changes
 	let formData = $state({
 		name: '',
 		description: '',
 		price: '',
-		compareAtPrice: '',
 		stock: '',
 		sku: '',
 		imageUrl: '',
 		categoryId: '',
-		status: 'ACTIVE',
+		status: 'PUBLISHED',
 		isFeatured: false
 	});
 
+	
 	// Initialize form data when product changes
 	$effect(() => {
-		formData = {
-			name: data.product.name,
-			description: data.product.description || '',
-			price: data.product.price.toString(),
-			compareAtPrice: data.product.compareAtPrice?.toString() || '',
-			stock: data.product.stock.toString(),
-			sku: data.product.sku || '',
-			imageUrl: data.product.imageUrl || '',
-			categoryId: data.product.categoryId || '',
-			status: data.product.status,
-			isFeatured: data.product.isFeatured
-		};
+		if (product) {
+			formData = {
+				name: product.name,
+				description: product.description || '',
+				price: product.price.toString(),
+				stock: product.stock.toString(),
+				sku: product.sku || '',
+				imageUrl: product.imageUrl || '',
+				categoryId: product.categoryId || '',
+				status: product.status,
+				isFeatured: product.isFeatured
+			};
+		}
 	});
 
 	let isSubmitting = $state(false);
@@ -72,7 +73,8 @@
 				const result = await response.json();
 
 				if (result.success) {
-					// Refresh product data to show new images by reloading the page data
+					// For now, reload the page to show new images
+					// TODO: Implement dynamic update without reload
 					window.location.reload();
 				} else {
 					throw new Error(result.error || 'Error al subir imagen');
@@ -104,14 +106,12 @@
 			if (!response.ok) {
 				throw new Error('Error al eliminar imagen');
 			}
-
-			// Refresh product data by reloading page
-			window.location.reload();
 		} catch (error) {
-			uploadError = error instanceof Error ? error.message : 'Error al eliminar la imagen';
+			console.error('Error deleting image:', error);
 		}
 	};
 
+	
 	// Handle setting primary image
 	const setPrimaryImage = async (imageId: string) => {
 		try {
@@ -146,13 +146,18 @@
 	// Update product data when form submission is successful
 	$effect(() => {
 		if (form?.success && form?.product) {
-			product = form.product;
+			// Update product data while preserving existing relations
+			product = {
+				...product,
+				...form.product,
+				category: product?.category,
+				images: product?.images
+			} as typeof product;
 			// Update form data with new product data
 			formData = {
 				name: product.name,
 				description: product.description || '',
 				price: product.price.toString(),
-				compareAtPrice: product.compareAtPrice?.toString() || '',
 				stock: product.stock.toString(),
 				sku: product.sku || '',
 				imageUrl: product.imageUrl || '',
@@ -239,13 +244,22 @@
 						isSubmitting = true;
 						return async ({ result }) => {
 							isSubmitting = false;
+							
 							if (result.type === 'success') {
 								// Product updated successfully
+								alert('Producto actualizado correctamente');
+								// Optional: redirect to products list
+								// goto('/admin/products');
+							} else if (result.type === 'failure') {
+								// Handle error
+								alert(result.data?.message || 'Error al actualizar el producto');
 							}
 						};
 					}}
 					class="space-y-6 p-6"
 				>
+					<!-- Hidden field for product ID -->
+					<input type="hidden" name="productId" value={product?.id} />
 					<div class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
 						<!-- Name -->
 						<div class="sm:col-span-4">
@@ -308,27 +322,6 @@
 							</div>
 						</div>
 
-						<!-- Compare At Price -->
-						<div class="sm:col-span-2">
-							<label for="compareAtPrice" class="block text-sm font-medium text-gray-700">
-								Precio de Comparación
-							</label>
-							<div class="relative mt-1 rounded-md shadow-sm">
-								<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-									<span class="text-gray-500 sm:text-sm">$</span>
-								</div>
-								<input
-									type="number"
-									id="compareAtPrice"
-									name="compareAtPrice"
-									bind:value={formData.compareAtPrice}
-									min="0"
-									step="0.01"
-									class="block w-full rounded-lg border border-gray-300 px-3 py-2 pl-7 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
-								/>
-							</div>
-						</div>
-
 						<!-- Stock -->
 						<div class="sm:col-span-2">
 							<label for="stock" class="block text-sm font-medium text-gray-700"> Stock * </label>
@@ -370,55 +363,14 @@
 								bind:value={formData.status}
 								class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm"
 							>
-								<option value="ACTIVE">Activo</option>
-								<option value="INACTIVE">Inactivo</option>
+								<option value="PUBLISHED">Publicado</option>
+								<option value="DRAFT">Borrador</option>
 								<option value="OUT_OF_STOCK">Sin Stock</option>
+								<option value="ARCHIVED">Archivado</option>
 							</select>
 						</div>
 
-						<!-- Primary Image Preview -->
-						<div class="mb-4 sm:col-span-6">
-							<fieldset class="mb-2 block text-sm font-medium text-gray-700">
-								<legend>Vista Previa - Imagen Principal</legend>
-							</fieldset>
-							<div class="overflow-hidden rounded-lg border border-gray-300">
-								{#if product.images && product.images.find((img: { isPrimary?: boolean }) => img.isPrimary)}
-									{@const primaryImage = product.images.find(
-										(img: { isPrimary?: boolean }) => img.isPrimary
-									)}
-									{#if primaryImage}
-										<img
-											src={primaryImage.url}
-											alt={primaryImage.alt || product.name}
-											class="h-48 w-full object-cover"
-										/>
-									{/if}
-								{:else if product.images && product.images.length > 0}
-									<img
-										src={product.images[0].url}
-										alt={product.images[0].alt || product.name}
-										class="h-48 w-full object-cover"
-									/>
-								{:else}
-									<div class="flex h-48 w-full items-center justify-center bg-gray-200">
-										<svg
-											class="h-12 w-12 text-gray-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-											></path>
-										</svg>
-									</div>
-								{/if}
-							</div>
-						</div>
-
+						
 						<!-- Image Upload -->
 						<div class="sm:col-span-6">
 							<label for="imageUpload" class="block text-sm font-medium text-gray-700">
@@ -469,37 +421,30 @@
 							{#if product.images && product.images.length > 0}
 								<div class="mt-4">
 									<h4 class="mb-2 text-sm font-medium text-gray-700">Imágenes actuales</h4>
-									<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+									<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 										{#each product.images as image (image.id)}
-											<div class="group relative">
-												<img
-													src={image.url}
-													alt={image.alt || product.name}
-													class="h-24 w-full rounded-lg border-2 object-cover {image.isPrimary
-														? 'border-green-500'
-														: 'border-gray-200'}"
-												/>
+											<div class="group relative bg-[#f8f8f8] rounded-xl border border-zinc-200 p-4">
+												<div class="relative flex min-h-[200px] items-center justify-center">
+													<img
+														src={image.url}
+														alt={image.alt || product.name}
+														class="max-h-[180px] w-auto object-contain transition duration-300 group-hover:scale-[1.03]"
+													/>
 												{#if image.isPrimary}
 													<div
-														class="absolute top-1 left-1 rounded-full bg-green-500 p-1 text-white"
+														class="absolute top-3 left-3 z-10 rounded-r-md px-3 py-1 text-xs font-extrabold uppercase tracking-wide bg-orange-500 text-white"
 													>
-														<svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-															<path
-																fill-rule="evenodd"
-																d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-																clip-rule="evenodd"
-															/>
-														</svg>
+														Principal
 													</div>
 												{/if}
 												<div
-													class="absolute top-1 right-1 flex space-x-1 opacity-0 transition-opacity group-hover:opacity-100"
+													class="absolute top-3 right-3 z-10 flex space-x-1 opacity-0 transition-opacity group-hover:opacity-100"
 												>
 													{#if !image.isPrimary}
 														<button
 															type="button"
 															onclick={() => setPrimaryImage(image.id)}
-															class="rounded-full bg-blue-500 p-1 text-white"
+															class="rounded-full bg-blue-500 p-1 text-white hover:bg-blue-600 transition-colors"
 															title="Marcar como principal"
 														>
 															<svg
@@ -520,7 +465,7 @@
 													<button
 														type="button"
 														onclick={() => deleteImage(image.id)}
-														class="rounded-full bg-red-500 p-1 text-white"
+														class="rounded-full bg-red-500 p-1 text-white hover:bg-red-600 transition-colors"
 														title="Eliminar imagen"
 													>
 														<svg
@@ -539,6 +484,7 @@
 													</button>
 												</div>
 											</div>
+										</div>
 										{/each}
 									</div>
 								</div>

@@ -4,27 +4,45 @@ const prisma = new PrismaClient();
 
 export async function load() {
 	try {
-		// Get all products with category info
-		const productsData = await prisma.product.findMany({
-			include: {
-				category: {
-					select: {
-						id: true,
-						name: true,
-						slug: true
+		// Get products with pagination and filters
+		const page = 1;
+		const limit = 20;
+		const skip = (page - 1) * limit;
+
+		const [productsData, totalCount] = await Promise.all([
+			prisma.product.findMany({
+				include: {
+					category: {
+						select: {
+							id: true,
+							name: true,
+							slug: true,
+							isActive: true
+						}
+					},
+					images: {
+						select: {
+							id: true,
+							url: true,
+							isPrimary: true
+						},
+						orderBy: { sortOrder: 'asc' },
+						take: 1
 					}
-				}
-			},
-			orderBy: {
-				createdAt: 'desc'
-			}
-		});
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
+				skip,
+				take: limit
+			}),
+			prisma.product.count()
+		]);
 
 		// Serialize prices for JSON compatibility
 		const products = productsData.map((product) => ({
 			...product,
-			price: Number(product.price),
-			compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+			price: Number(product.price)
 		}));
 
 		// Get all categories for filters
@@ -41,8 +59,8 @@ export async function load() {
 		// Calculate statistics
 		const stats = {
 			totalProducts: products.length,
-			activeProducts: products.filter((p) => p.status === 'ACTIVE').length,
-			inactiveProducts: products.filter((p) => p.status === 'INACTIVE').length,
+			activeProducts: products.filter((p) => p.status === 'PUBLISHED').length,
+			inactiveProducts: products.filter((p) => p.status === 'DRAFT').length,
 			outOfStockProducts: products.filter((p) => p.status === 'OUT_OF_STOCK' || p.stock === 0)
 				.length,
 			featuredProducts: products.filter((p) => p.isFeatured).length,
@@ -52,16 +70,17 @@ export async function load() {
 			lowStockProducts: products.filter((p) => p.stock > 0 && p.stock <= 5).length
 		};
 
-		console.log('Admin products loading:', {
-			productsCount: products.length,
-			categoriesCount: categories.length,
-			productsData: products.slice(0, 2) // Log first 2 products for debugging
-		});
-
+		
 		return {
 			products,
 			categories,
-			stats
+			stats,
+			pagination: {
+				currentPage: page,
+				totalPages: Math.ceil(totalCount / limit),
+				totalCount,
+				limit
+			}
 		};
 	} catch (error) {
 		console.error('Error loading products:', error);

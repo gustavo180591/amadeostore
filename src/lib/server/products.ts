@@ -4,9 +4,17 @@ const prisma = new PrismaClient();
 
 export async function getProducts() {
 	const products = await prisma.product.findMany({
-		where: { status: 'ACTIVE' },
+		where: {
+			status: 'PUBLISHED',
+			category: {
+				isActive: true
+			}
+		},
 		include: {
-			category: true
+			category: true,
+			images: {
+				orderBy: { sortOrder: 'asc' }
+			}
 		},
 		orderBy: {
 			name: 'asc'
@@ -33,10 +41,13 @@ export async function getProductsByCategory(categoryId: string) {
 	const products = await prisma.product.findMany({
 		where: {
 			categoryId,
-			status: 'ACTIVE'
+			status: 'PUBLISHED'
 		},
 		include: {
-			category: true
+			category: true,
+			images: {
+				orderBy: { sortOrder: 'asc' }
+			}
 		},
 		orderBy: {
 			name: 'asc'
@@ -52,7 +63,7 @@ export async function getCategories() {
 			_count: {
 				select: {
 					products: {
-						where: { status: 'ACTIVE' }
+						where: { status: 'PUBLISHED' }
 					}
 				}
 			}

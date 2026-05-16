@@ -38,12 +38,19 @@ model Session {
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  userId     String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
+  id             String         @id @default(cuid())
+  userId         String
+  status         OrderStatus    @default(PENDING)
+  paymentStatus  PaymentStatus  @default(PENDING)
+  paymentMethod  PaymentMethod?
+  deliveryMethod DeliveryMethod?
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  shippingAddress Json?
+  trackingNumber String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems     OrderItem[]
 }
 
 model OrderItem {
@@ -85,13 +92,15 @@ model Product {
   id             String         @id @default(cuid())
   name           String
   slug           String         @unique
+  brand          String?
+  model          String?
   description    String?
   price          Decimal        @db.Decimal(10, 2)
-  compareAtPrice Decimal?       @db.Decimal(10, 2)
   stock          Int            @default(0)
   sku            String?        @unique
   imageUrl       String?
-  status         ProductStatus  @default(ACTIVE)
+  specs          Json?
+  status         ProductStatus  @default(DRAFT)
   isFeatured     Boolean        @default(false)
   categoryId     String?
   createdAt      DateTime       @default(now())
@@ -134,9 +143,10 @@ enum UserStatus {
 }
 
 enum ProductStatus {
-  ACTIVE
-  INACTIVE
+  DRAFT
+  PUBLISHED
   OUT_OF_STOCK
+  ARCHIVED
 }
 
 enum OrderStatus {

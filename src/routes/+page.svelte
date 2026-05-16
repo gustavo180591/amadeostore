@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { cart } from '$lib/stores/cart';
+	import CartDrawer from '$lib/components/CartDrawer.svelte';
+	import WhatsAppButton from '$lib/components/WhatsAppButton.svelte';
+	import FeaturedProducts from '$lib/components/store/FeaturedProducts.svelte';
+	import LatestProducts from '$lib/components/store/LatestProducts.svelte';
 
 	const data = $derived($page.data);
 	const featuredProducts = $derived(data?.featuredProducts || []);
@@ -8,42 +11,7 @@
 	const categories = $derived(data?.categories || []);
 	const stats = $derived(data?.stats);
 
-	// Format currency
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat('es-AR', {
-			style: 'currency',
-			currency: 'ARS'
-		}).format(amount);
-	};
-
-	// Get status badge styling
-	const getStatusBadge = (status: string) => {
-		switch (status) {
-			case 'ACTIVE':
-				return 'bg-green-100 text-green-800';
-			case 'INACTIVE':
-				return 'bg-gray-100 text-gray-800';
-			case 'OUT_OF_STOCK':
-				return 'bg-red-100 text-red-800';
-			default:
-				return 'bg-gray-100 text-gray-800';
-		}
-	};
-
-	// Get status text
-	const getStatusText = (status: string) => {
-		switch (status) {
-			case 'ACTIVE':
-				return 'Activo';
-			case 'INACTIVE':
-				return 'Inactivo';
-			case 'OUT_OF_STOCK':
-				return 'Sin Stock';
-			default:
-				return status;
-		}
-	};
-</script>
+	</script>
 
 <svelte:head>
 	<title>AMADEO STORE - Tienda Online</title>
@@ -54,79 +22,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<!-- Header -->
-	<header class="sticky top-0 z-40 bg-white shadow-sm">
-		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div class="flex h-16 items-center justify-between">
-				<!-- Logo -->
-				<div class="flex items-center">
-					<a href="/" class="flex items-center" rel="external">
-						<img src="/logo.png" alt="AMADEO STORE" class="h-8 w-auto" />
-					</a>
-				</div>
-
-				<!-- Navigation -->
-				<nav class="hidden space-x-8 md:flex">
-					<a
-						href="#featured"
-						class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-green-600"
-					>
-						Destacados
-					</a>
-					<a
-						href="#products"
-						class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-green-600"
-					>
-						Productos
-					</a>
-					<a
-						href="#categories"
-						class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-green-600"
-					>
-						Categorías
-					</a>
-					<a
-						href="/admin"
-						class="px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-green-600"
-						rel="external"
-					>
-						Admin
-					</a>
-				</nav>
-
-				<!-- Cart -->
-				<div class="flex items-center space-x-4">
-					<button
-						class="p-2 text-gray-700 transition-colors hover:text-green-600"
-						aria-label="Carrito de compras"
-					>
-						<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-							></path>
-						</svg>
-					</button>
-					<button
-						class="p-2 text-gray-700 transition-colors hover:text-green-600 md:hidden"
-						aria-label="Menú móvil"
-					>
-						<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 6h16M4 12h16M4 18h16"
-							></path>
-						</svg>
-					</button>
-				</div>
-			</div>
-		</div>
-	</header>
-
+	
 	<!-- Hero Section -->
 	<section class="bg-linear-to-br from-green-50 to-white py-20">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -145,12 +41,7 @@
 					>
 						Ver Productos
 					</a>
-					<a
-						href="#categories"
-						class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50"
-					>
-						Explorar Categorías
-					</a>
+					<WhatsAppButton size="lg" text="Consultar por WhatsApp" />
 				</div>
 			</div>
 		</div>
@@ -178,76 +69,7 @@
 
 	<!-- Featured Products -->
 	{#if featuredProducts.length > 0}
-		<section id="featured" class="bg-gray-50 py-16">
-			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div class="mb-12 text-center">
-					<h2 class="text-3xl font-bold text-gray-900">Productos Destacados</h2>
-					<p class="mt-4 text-lg text-gray-600">Nuestra selección de los mejores productos</p>
-				</div>
-
-				<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-					{#each featuredProducts as product (product.id)}
-						<div
-							class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
-						>
-							<div class="aspect-w-1 aspect-h-1 bg-gray-200">
-								{#if product.imageUrl}
-									<img src={product.imageUrl} alt={product.name} class="h-48 w-full object-cover" />
-								{:else}
-									<div class="flex h-48 w-full items-center justify-center bg-gray-200">
-										<svg
-											class="h-12 w-12 text-gray-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-											></path>
-										</svg>
-									</div>
-								{/if}
-							</div>
-							<div class="p-4">
-								<h3 class="text-lg font-medium text-gray-900">{product.name}</h3>
-								<p class="text-sm text-gray-500">{product.category?.name || 'Sin categoría'}</p>
-								<div class="mt-2 flex items-center justify-between">
-									<span class="text-2xl font-bold text-green-600"
-										>{formatCurrency(product.price)}</span
-									>
-									{#if product.compareAtPrice}
-										<span class="text-sm text-gray-500 line-through"
-											>{formatCurrency(product.compareAtPrice)}</span
-										>
-									{/if}
-								</div>
-								<div class="mt-3 flex items-center justify-between">
-									<span
-										class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getStatusBadge(
-											product.status
-										)}"
-									>
-										{getStatusText(product.status)}
-									</span>
-									{#if product.stock <= 5}
-										<span class="text-xs font-medium text-red-500">¡Últimas unidades!</span>
-									{/if}
-								</div>
-								<button
-									onclick={() => cart.addItem(product.id)}
-									class="mt-4 w-full rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
-								>
-									Agregar al Carrito
-								</button>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
+		<FeaturedProducts products={featuredProducts} title="Productos Destacados" />
 	{/if}
 
 	<!-- Categories -->
@@ -292,83 +114,7 @@
 
 	<!-- Latest Products -->
 	{#if latestProducts.length > 0}
-		<section id="products" class="bg-gray-50 py-16">
-			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div class="mb-12 text-center">
-					<h2 class="text-3xl font-bold text-gray-900">Últimos Productos</h2>
-					<p class="mt-4 text-lg text-gray-600">Las últimas novedades en nuestra tienda</p>
-				</div>
-
-				<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-					{#each latestProducts as product (product.id)}
-						<div
-							class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
-						>
-							<div class="aspect-w-1 aspect-h-1 bg-gray-200">
-								{#if product.imageUrl}
-									<img src={product.imageUrl} alt={product.name} class="h-48 w-full object-cover" />
-								{:else}
-									<div class="flex h-48 w-full items-center justify-center bg-gray-200">
-										<svg
-											class="h-12 w-12 text-gray-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-											></path>
-										</svg>
-									</div>
-								{/if}
-							</div>
-							<div class="p-4">
-								<h3 class="text-lg font-medium text-gray-900">{product.name}</h3>
-								<p class="text-sm text-gray-500">{product.category?.name || 'Sin categoría'}</p>
-								<div class="mt-2 flex items-center justify-between">
-									<span class="text-2xl font-bold text-green-600"
-										>{formatCurrency(product.price)}</span
-									>
-									{#if product.compareAtPrice}
-										<span class="text-sm text-gray-500 line-through"
-											>{formatCurrency(product.compareAtPrice)}</span
-										>
-									{/if}
-								</div>
-								<div class="mt-3 flex items-center justify-between">
-									<span
-										class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getStatusBadge(
-											product.status
-										)}"
-									>
-										{getStatusText(product.status)}
-									</span>
-									<span class="text-xs text-gray-500">Stock: {product.stock}</span>
-								</div>
-								<div class="mt-4 flex space-x-2">
-									<button
-										onclick={() => cart.addItem(product.id)}
-										class="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
-									>
-										Agregar al Carrito
-									</button>
-									<a
-										href={`/products/${product.slug}`}
-										class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-center text-gray-700 transition-colors hover:bg-gray-50"
-										rel="external"
-									>
-										Ver Detalles
-									</a>
-								</div>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
+		<LatestProducts products={latestProducts} title="Últimos Productos" />
 	{/if}
 
 	<!-- Footer -->
@@ -449,4 +195,10 @@
 			</div>
 		</div>
 	</footer>
+
+<!-- Cart Drawer Component -->
+<CartDrawer />
+
+<!-- Floating WhatsApp Button for mobile -->
+<WhatsAppButton variant="floating" />
 </div>

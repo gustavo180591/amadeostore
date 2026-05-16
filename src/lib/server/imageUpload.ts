@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, unlink } from 'fs/promises';
 import { join } from 'path';
 import { PrismaClient } from '@prisma/client';
 
@@ -59,34 +59,53 @@ export async function uploadProductImage(file: File, productId?: string): Promis
 
 		// If productId is provided, save to database
 		if (productId) {
-			// Get current max sort order for this product
-			const maxSort = await prisma.productImage.findFirst({
-				where: { productId },
-				orderBy: { sortOrder: 'desc' }
-			});
+			try {
+				// Check if product has any existing images
+				const existingImages = await prisma.productImage.findMany({
+					where: { productId }
+				});
 
-			const sortOrder = (maxSort?.sortOrder || 0) + 1;
+				// Get current max sort order for this product
+				const maxSort = await prisma.productImage.findFirst({
+					where: { productId },
+					orderBy: { sortOrder: 'desc' }
+				});
 
-			// Save to database
-			const productImage = await prisma.productImage.create({
-				data: {
-					url: imageUrl,
-					productId,
-					sortOrder,
-					isPrimary: false // New images are not primary by default
-				}
-			});
+				const sortOrder = (maxSort?.sortOrder || 0) + 1;
 
-			return {
-				success: true,
-				imageUrl,
-				imageId: productImage.id
-			};
+				// If this is the first image, make it primary
+				const isFirstImage = existingImages.length === 0;
+
+				// Save to database
+				const productImage = await prisma.productImage.create({
+					data: {
+						url: imageUrl,
+						productId,
+						sortOrder,
+						isPrimary: isFirstImage // First image becomes primary
+					}
+				});
+
+				return {
+					success: true,
+					imageUrl,
+					imageId: productImage.id
+				};
+			} catch (dbError) {
+				console.error('Database error saving image:', dbError);
+				return {
+					success: false,
+					error: 'Error al guardar la imagen en la base de datos'
+				};
+			}
 		}
 
+		// For new products (no productId), just return the URL
+		// The frontend will handle associating it with the product later
 		return {
 			success: true,
-			imageUrl
+			imageUrl,
+			imageId: `temp-${Date.now()}-${Math.random().toString(36).substring(2, 15)}` // Temporary ID for frontend
 		};
 	} catch (error) {
 		console.error('Error uploading image:', error);
@@ -130,4 +149,3 @@ export async function deleteProductImage(imageId: string): Promise<UploadResult>
 	}
 }
 
-import { unlink } from 'fs/promises';

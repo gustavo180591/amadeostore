@@ -10,7 +10,7 @@ export async function load() {
 				_count: {
 					select: {
 						products: {
-							where: { status: 'ACTIVE' }
+							where: { status: 'PUBLISHED' }
 						}
 					}
 				}
@@ -23,7 +23,7 @@ export async function load() {
 			totalCategories: await prisma.category.count(),
 			activeCategories: await prisma.category.count({ where: { isActive: true } }),
 			inactiveCategories: await prisma.category.count({ where: { isActive: false } }),
-			totalProducts: await prisma.product.count({ where: { status: 'ACTIVE' } })
+			totalProducts: await prisma.product.count({ where: { status: 'PUBLISHED' } })
 		};
 
 		return {

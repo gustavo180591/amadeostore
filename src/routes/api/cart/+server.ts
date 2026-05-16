@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Product not found' }, { status: 404 });
 		}
 
-		if (product.status !== 'ACTIVE') {
+		if (product.status !== 'PUBLISHED') {
 			return json({ error: 'Product is not available' }, { status: 400 });
 		}
 

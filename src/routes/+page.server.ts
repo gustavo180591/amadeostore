@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 export async function load() {
 	try {
 		// Get featured products
-		const featuredProducts = await prisma.product.findMany({
+		const featuredProductsData = await prisma.product.findMany({
 			where: {
 				isFeatured: true,
-				status: 'ACTIVE'
+				status: 'PUBLISHED'
 			},
 			include: {
 				category: {
@@ -17,16 +17,35 @@ export async function load() {
 						name: true,
 						slug: true
 					}
+				},
+				images: {
+					where: { isPrimary: true },
+					take: 1
 				}
 			},
 			orderBy: { createdAt: 'desc' },
 			take: 8
 		});
 
+		// Transform featured products to the new format
+		const featuredProducts = featuredProductsData.map((product) => ({
+			id: product.id,
+			name: product.name,
+			slug: product.slug,
+			image: product.images[0]?.url || product.imageUrl || '/images/placeholder-product.png',
+			price: Number(product.price),
+			oldPrice: null, // Could be added to schema later
+			discount: null, // Could be calculated from oldPrice
+			badge: product.isFeatured ? 'Más vendidos' : null,
+			badgeColor: (product.isFeatured ? 'orange' : 'blue') as 'orange' | 'pink' | 'blue' | 'green',
+			promoText: '+20% OFF EN 1 PAGO + ENVÍO GRATIS', // Could be added to schema later
+			isFeatured: product.isFeatured
+		}));
+
 		// Get latest products
-		const latestProducts = await prisma.product.findMany({
+		const latestProductsData = await prisma.product.findMany({
 			where: {
-				status: 'ACTIVE'
+				status: 'PUBLISHED'
 			},
 			include: {
 				category: {
@@ -35,11 +54,30 @@ export async function load() {
 						name: true,
 						slug: true
 					}
+				},
+				images: {
+					where: { isPrimary: true },
+					take: 1
 				}
 			},
 			orderBy: { createdAt: 'desc' },
-			take: 12
+			take: 8
 		});
+
+		// Transform latest products to the new format
+		const latestProducts = latestProductsData.map((product) => ({
+			id: product.id,
+			name: product.name,
+			slug: product.slug,
+			image: product.images[0]?.url || product.imageUrl || '/images/placeholder-product.png',
+			price: Number(product.price),
+			oldPrice: null, // Could be added to schema later
+			discount: null, // Could be calculated from oldPrice
+			badge: 'Nuevo', // Different badge for latest products
+			badgeColor: 'blue' as const,
+			promoText: '+20% OFF EN 1 PAGO + ENVÍO GRATIS', // Could be added to schema later
+			isFeatured: product.isFeatured
+		}));
 
 		// Get active categories
 		const categories = await prisma.category.findMany({
@@ -50,17 +88,16 @@ export async function load() {
 
 		// Get statistics
 		const stats = {
-			totalProducts: await prisma.product.count({ where: { status: 'ACTIVE' } }),
+			totalProducts: await prisma.product.count({ where: { status: 'PUBLISHED' } }),
 			totalCategories: await prisma.category.count({ where: { isActive: true } }),
-			featuredCount: await prisma.product.count({ where: { isFeatured: true, status: 'ACTIVE' } })
+			featuredCount: await prisma.product.count({ where: { isFeatured: true, status: 'PUBLISHED' } })
 		};
 
 		// Convert Decimal to number for serialization
 		const serializeProducts = (products: typeof featuredProducts) => {
 			return products.map((product) => ({
 				...product,
-				price: Number(product.price),
-				compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null
+				price: Number(product.price)
 			}));
 		};
 

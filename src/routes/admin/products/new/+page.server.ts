@@ -30,23 +30,35 @@ export async function load() {
 export const actions = {
 	default: async ({ request }: { request: Request }) => {
 		try {
+			console.log('Product creation form submission started');
 			const data = await request.formData();
+			console.log('Form data received:', Object.fromEntries(data.entries()));
 
 			// Extract and validate form data
 			const name = data.get('name') as string;
+			const brand = data.get('brand') as string;
+			const model = data.get('model') as string;
 			const sku = data.get('sku') as string;
 			const slug = data.get('slug') as string;
 			const description = data.get('description') as string;
 			const price = data.get('price') as string;
-			const compareAtPrice = data.get('compareAtPrice') as string;
 			const stock = data.get('stock') as string;
-			const imageUrl = data.get('imageUrl') as string;
 			const categoryId = data.get('categoryId') as string;
 			const status = data.get('status') as string;
 			const isFeatured = data.get('isFeatured') === 'on';
 
+			console.log('Extracted form data:', { name, price, stock, status });
+
+			// Handle uploaded image URLs
+			const uploadedImageUrls = data.getAll('uploadedImageUrls') as string[];
+			const primaryImageIndex = parseInt(data.get('primaryImageIndex') as string) || 0;
+			
+			console.log('Images:', { uploadedImageUrls, primaryImageIndex });
+
+			console.log('About to start validation...');
 			// Required field validation
 			if (!name || !price || !stock) {
+				console.log('Validation failed:', { name: !!name, price: !!price, stock: !!stock });
 				return fail(400, {
 					error: 'Nombre, precio y stock son campos obligatorios',
 					data: {
@@ -55,9 +67,7 @@ export const actions = {
 						slug,
 						description,
 						price,
-						compareAtPrice,
 						stock,
-						imageUrl,
 						categoryId,
 						status,
 						isFeatured
@@ -65,6 +75,7 @@ export const actions = {
 				});
 			}
 
+			console.log('Validation passed, proceeding to price validation...');
 			// Price validation
 			const parsedPrice = parseFloat(price);
 			if (isNaN(parsedPrice) || parsedPrice < 0) {
@@ -76,9 +87,7 @@ export const actions = {
 						slug,
 						description,
 						price,
-						compareAtPrice,
 						stock,
-						imageUrl,
 						categoryId,
 						status,
 						isFeatured
@@ -86,6 +95,7 @@ export const actions = {
 				});
 			}
 
+			console.log('Price validation passed, proceeding to stock validation...');
 			// Stock validation
 			const parsedStock = parseInt(stock);
 			if (isNaN(parsedStock) || parsedStock < 0) {
@@ -97,9 +107,7 @@ export const actions = {
 						slug,
 						description,
 						price,
-						compareAtPrice,
 						stock,
-						imageUrl,
 						categoryId,
 						status,
 						isFeatured
@@ -107,30 +115,9 @@ export const actions = {
 				});
 			}
 
-			// Compare at price validation
-			let parsedCompareAtPrice = null;
-			if (compareAtPrice) {
-				parsedCompareAtPrice = parseFloat(compareAtPrice);
-				if (isNaN(parsedCompareAtPrice) || parsedCompareAtPrice < 0) {
-					return fail(400, {
-						error: 'El precio de comparación debe ser un número válido mayor o igual a 0',
-						data: {
-							name,
-							sku,
-							slug,
-							description,
-							price,
-							compareAtPrice,
-							stock,
-							imageUrl,
-							categoryId,
-							status,
-							isFeatured
-						}
-					});
-				}
-			}
+			console.log('Stock validation passed, stock value is:', parsedStock);
 
+			console.log('Skipping compare price validation (field removed), proceeding to slug generation...');
 			// Generate slug if not provided
 			const finalSlug =
 				slug ||
@@ -139,6 +126,7 @@ export const actions = {
 					.replace(/[^a-z0-9]+/g, '-')
 					.replace(/(^-|-$)/g, '');
 
+			console.log('Generated slug:', finalSlug);
 			// Check if SKU already exists (if provided)
 			if (sku) {
 				const existingProduct = await prisma.product.findUnique({
@@ -154,9 +142,7 @@ export const actions = {
 							slug,
 							description,
 							price,
-							compareAtPrice,
 							stock,
-							imageUrl,
 							categoryId,
 							status,
 							isFeatured
@@ -179,9 +165,7 @@ export const actions = {
 						slug,
 						description,
 						price,
-						compareAtPrice,
 						stock,
-						imageUrl,
 						categoryId,
 						status,
 						isFeatured
@@ -204,9 +188,7 @@ export const actions = {
 							slug,
 							description,
 							price,
-							compareAtPrice,
 							stock,
-							imageUrl,
 							categoryId,
 							status,
 							isFeatured
@@ -216,26 +198,67 @@ export const actions = {
 			}
 
 			// Create the product
+			console.log('Creating product with data:', {
+				name,
+				brand,
+				model,
+				sku,
+				slug: finalSlug,
+				description,
+				price: parsedPrice,
+				stock: parsedStock,
+				categoryId,
+				status,
+				isFeatured
+			});
+			
 			const product = await prisma.product.create({
 				data: {
 					name,
+					brand: brand || null,
+					model: model || null,
 					sku: sku || null,
 					slug: finalSlug,
 					description: description || null,
 					price: parsedPrice,
-					compareAtPrice: parsedCompareAtPrice,
 					stock: parsedStock,
-					imageUrl: imageUrl || null,
 					categoryId: categoryId || null,
-					status: status as 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK',
+					status: status as 'DRAFT' | 'PUBLISHED' | 'OUT_OF_STOCK' | 'ARCHIVED',
 					isFeatured
 				}
 			});
+			
+			console.log('Product created successfully:', product.id);
 
-			return {
+			// Process uploaded images
+			if (uploadedImageUrls.length > 0) {
+				// Create database records for uploaded images
+				for (const [index, imageUrl] of uploadedImageUrls.entries()) {
+					try {
+						await prisma.productImage.create({
+							data: {
+								url: imageUrl,
+								productId: product.id,
+								sortOrder: index + 1,
+								isPrimary: index === primaryImageIndex // User selected primary image
+							}
+						});
+					} catch (error) {
+						console.error('Error creating image record:', error);
+					}
+				}
+			}
+
+			const result = {
 				success: 'Producto creado exitosamente',
-				product
+				product: {
+					...product,
+					price: Number(product.price)
+				}
 			};
+			
+			console.log('Returning success result:', result);
+			return result;
 		} catch (error) {
 			console.error('Error creating product:', error);
 
