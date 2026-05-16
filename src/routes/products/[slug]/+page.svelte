@@ -1,309 +1,303 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { cart } from '$lib/stores/cart';
-	import { resolve } from '$app/paths';
-	import type { PageData } from './$types';
+	import { ChevronRight, ChevronLeft, Check, CreditCard, Home, Store } from '@lucide/svelte';
 
-	const data = $derived($page.data as PageData);
+	const data = $derived($page.data);
 	const product = $derived(data?.product);
-	const relatedProducts = $derived(data?.relatedProducts || []);
 
-	// Format currency
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat('es-AR', {
+	let selectedImage = $state(product?.images?.[0]?.url || product?.imageUrl || '/images/placeholder-product.png');
+
+	const formatPrice = (value: number) =>
+		new Intl.NumberFormat('es-AR', {
 			style: 'currency',
-			currency: 'ARS'
-		}).format(amount);
-	};
+			currency: 'ARS',
+			maximumFractionDigits: 0
+		}).format(value);
 
-	// Get status badge styling
-	const getStatusBadge = (status: string) => {
-		switch (status) {
-			case 'ACTIVE':
-				return 'bg-green-100 text-green-800';
-			case 'INACTIVE':
-				return 'bg-gray-100 text-gray-800';
-			case 'OUT_OF_STOCK':
-				return 'bg-red-100 text-red-800';
-			default:
-				return 'bg-gray-100 text-gray-800';
-		}
-	};
+	const taxFreePrice = Math.round(Number(product?.price) / 1.21);
 
-	// Get status text
-	const getStatusText = (status: string) => {
-		switch (status) {
-			case 'ACTIVE':
-				return 'Activo';
-			case 'INACTIVE':
-				return 'Inactivo';
-			case 'OUT_OF_STOCK':
-				return 'Sin Stock';
-			default:
-				return status;
-		}
-	};
+	const oldPrice = product?.oldPrice ? Number(product.oldPrice) : null;
+	const discount = product?.discount || 20;
 
-	// Add to cart with quantity
-	const addToCart = () => {
-		if (product) {
-			cart.addItem(product.id, 1);
+	const colors = [
+		{
+			name: 'Pantone Sunrise Orange',
+			class: 'bg-orange-500'
+		},
+		{
+			name: 'Gris',
+			class: 'bg-slate-600'
+		},
+		{
+			name: 'Verde',
+			class: 'bg-emerald-700'
 		}
-	};
+	];
+
+	const memories = ['128 GB', '256 GB'];
+
+	let selectedColor = $state(colors[0].name);
+	let selectedMemory = $state(memories[0]);
+
+	function goBack() {
+		history.back();
+	}
+
+	function handleBuy() {
+		const message = `Hola Amadeo Store, quiero consultar por el producto: ${product?.name}`;
+		const phone = '5493760000000';
+		window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+	}
 </script>
 
 <svelte:head>
-	<title>{product?.name || 'Producto'} - AMADEO STORE</title>
-	<meta name="description" content={product?.description || 'Producto en AMADEO STORE'} />
+	<title>{product?.name || 'Producto'} | Amadeo Store</title>
+	<meta name="description" content={product?.description || 'Producto en Amadeo Store'} />
 </svelte:head>
 
-{#if product}
-	<div class="min-h-screen bg-gray-50">
-		<!-- Breadcrumb -->
-		<nav class="border-b bg-white">
-			<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div class="flex justify-center py-3">
-					<ol class="flex items-center space-x-2 text-sm text-gray-500">
-						<li><a href={resolve('/')} class="hover:text-gray-700">Inicio</a></li>
-						<li><span class="text-gray-300">/</span></li>
-						<li><a href="#products" class="hover:text-gray-700">Productos</a></li>
-						<li><span class="text-gray-300">/</span></li>
-						<li class="text-gray-900">{product.name}</li>
-					</ol>
-				</div>
+<section class="min-h-screen bg-[#f2f2f2] px-4 py-4">
+	<div class="mx-auto max-w-7xl">
+		<div class="mb-4 flex items-center justify-between text-sm">
+			<div class="flex items-center gap-2">
+				<a href="/" class="font-medium text-cyan-600 hover:underline">Tienda</a>
+				<ChevronRight size={16} class="text-zinc-500" />
+				<span class="font-semibold text-zinc-900">{product?.name}</span>
 			</div>
-		</nav>
 
-		<!-- Product Details -->
-		<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-			<div class="lg:grid lg:grid-cols-2 lg:gap-x-8">
-				<!-- Product Images -->
-				<div class="lg:col-span-1">
-					<div class="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-200">
-						{#if product.imageUrl}
-							<img src={product.imageUrl} alt={product.name} class="h-full w-full object-cover" />
+			<button
+				type="button"
+				onclick={goBack}
+				class="inline-flex items-center gap-1 font-medium text-cyan-600 hover:underline"
+			>
+				<ChevronLeft size={16} />
+				Volver
+			</button>
+		</div>
+
+		{#if product}
+			<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-md">
+				<div class="grid grid-cols-1 lg:grid-cols-[1.45fr_1fr]">
+					<!-- Columna izquierda: imágenes -->
+					<div class="relative border-b border-zinc-200 p-4 lg:border-b-0 lg:border-r">
+						{#if product.badge}
+							<div
+								class="absolute left-0 top-4 z-20 bg-orange-500 px-4 py-2 text-xl font-bold uppercase tracking-wide text-white shadow"
+								style="clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);"
+							>
+								{product.badge}
+							</div>
 						{:else}
-							<div class="flex h-full w-full items-center justify-center bg-gray-200">
-								<svg
-									class="h-12 w-12 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-									></path>
-								</svg>
+							<div
+								class="absolute left-0 top-4 z-20 bg-orange-500 px-4 py-2 text-xl font-bold uppercase tracking-wide text-white shadow"
+								style="clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);"
+							>
+								Más vendidos
 							</div>
 						{/if}
+
+						{#if discount}
+							<div
+								class="absolute left-5 top-24 z-20 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-cyan-500 text-white shadow-lg"
+							>
+								<span class="text-6xl font-extrabold leading-none">{discount}</span>
+								<span class="-mt-1 text-3xl font-light leading-none">%</span>
+								<span class="-mt-1 text-lg font-bold uppercase leading-none">OFF</span>
+							</div>
+						{/if}
+
+						<div class="grid min-h-[560px] grid-cols-1 items-center gap-4 md:grid-cols-[1fr_76px]">
+							<div class="flex items-center justify-center px-6 pt-20 md:pt-8">
+								<img
+									src={selectedImage}
+									alt={product.name}
+									class="max-h-[510px] w-auto object-contain"
+								/>
+							</div>
+
+							<div class="flex justify-center gap-3 md:flex-col">
+								{#each product.images as image}
+									<button
+										type="button"
+										onclick={() => (selectedImage = image.url)}
+										class={`flex h-16 w-16 items-center justify-center rounded-lg border bg-white p-1 shadow-sm transition ${
+											selectedImage === image.url ? 'border-cyan-500 ring-2 ring-cyan-100' : 'border-zinc-200'
+										}`}
+									>
+										<img src={image.url} alt={product.name} class="max-h-full object-contain" />
+									</button>
+								{/each}
+
+								{#if !product.images?.length}
+									<button
+										type="button"
+										class="flex h-16 w-16 items-center justify-center rounded-lg border border-cyan-500 bg-white p-1 shadow-sm ring-2 ring-cyan-100"
+									>
+										<img src={selectedImage} alt={product.name} class="max-h-full object-contain" />
+									</button>
+								{/if}
+							</div>
+						</div>
 					</div>
 
-					{#if product.images && product.images.length > 0}
-						<div class="mt-4 grid grid-cols-4 gap-2">
-							{#each product.images as image (image.id)}
-								<div
-									class="aspect-w-1 aspect-h-1 cursor-pointer overflow-hidden rounded-md bg-gray-200"
-								>
-									<img
-										src={image.url}
-										alt={image.alt || 'Product image'}
-										class="h-full w-full object-cover transition-opacity hover:opacity-75"
-									/>
+					<!-- Columna derecha: información -->
+					<div class="p-7 lg:p-8">
+						<div class="mb-3 flex items-start justify-between gap-4">
+							<h1 class="text-4xl font-extrabold leading-tight text-zinc-900">
+								{product.name}
+							</h1>
+
+							{#if product.stock > 0}
+								<div class="mt-2 flex shrink-0 items-center gap-2 text-sm font-bold uppercase text-emerald-700">
+									<Check size={16} />
+									En stock
 								</div>
-							{/each}
+							{:else}
+								<div class="mt-2 text-sm font-bold uppercase text-red-600">
+									Sin stock
+								</div>
+							{/if}
 						</div>
-					{/if}
-				</div>
 
-				<!-- Product Info -->
-				<div class="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-					<h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">{product.name}</h1>
-
-					<!-- Category -->
-					{#if product.category}
-						<div class="mt-2">
-							<span class="text-sm text-gray-600">
-								Categoría: {product.category.name}
+						<div class="mt-5 flex items-end gap-3">
+							<span class="text-4xl font-light text-red-600">
+								{formatPrice(Number(product.price))}
 							</span>
-						</div>
-					{/if}
 
-					<!-- Price -->
-					<div class="mt-4">
-						<div class="flex items-baseline">
-							<span class="text-3xl font-bold text-gray-900">{formatCurrency(product.price)}</span>
-							{#if product.compareAtPrice}
-								<span class="ml-2 text-lg text-gray-500 line-through"
-									>{formatCurrency(product.compareAtPrice)}</span
-								>
-								<span class="ml-2 text-sm font-medium text-green-600">
-									Ahorra {formatCurrency(product.compareAtPrice - product.price)}
+							{#if oldPrice}
+								<span class="pb-2 text-lg text-zinc-400 line-through">
+									{formatPrice(oldPrice)}
 								</span>
 							{/if}
 						</div>
-					</div>
 
-					<!-- Status and Stock -->
-					<div class="mt-4 flex items-center space-x-4">
-						<span
-							class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getStatusBadge(
-								product.status
-							)}"
-						>
-							{getStatusText(product.status)}
-						</span>
-						<span class="text-sm text-gray-600">Stock: {product.stock}</span>
-						{#if product.stock <= 5}
-							<span class="text-sm font-medium text-red-500">¡Últimas unidades!</span>
-						{/if}
-					</div>
+						<p class="mt-1 text-xs uppercase text-zinc-400">
+							Precio sin impuestos {formatPrice(taxFreePrice)}
+						</p>
 
-					<!-- Description -->
-					{#if product.description}
+						<p class="mt-5 text-base font-extrabold uppercase text-cyan-600">
+							+20% OFF EN 1 PAGO + ENVÍO GRATIS
+						</p>
+
 						<div class="mt-6">
-							<h3 class="text-lg font-medium text-gray-900">Descripción</h3>
-							<div class="prose prose-sm mt-2 max-w-none text-base text-gray-700">
-								<p>{product.description}</p>
+							<p class="text-base text-zinc-900">
+								Color:
+								<strong>{selectedColor}</strong>
+							</p>
+
+							<div class="mt-3 flex gap-3">
+								{#each colors as color}
+									<button
+										type="button"
+										aria-label={color.name}
+										onclick={() => (selectedColor = color.name)}
+										class={`h-9 w-9 rounded-full border-2 shadow-md transition ${color.class} ${
+											selectedColor === color.name
+												? 'border-cyan-500 ring-2 ring-cyan-200'
+												: 'border-white'
+										}`}
+									></button>
+								{/each}
 							</div>
 						</div>
-					{/if}
 
-					<!-- Add to Cart -->
-					<div class="mt-8">
+						<div class="mt-6">
+							<p class="text-base text-zinc-900">
+								Memoria:
+								<strong>{selectedMemory}</strong>
+							</p>
+
+							<div class="mt-3 flex gap-2">
+								{#each memories as memory}
+									<button
+										type="button"
+										onclick={() => (selectedMemory = memory)}
+										class={`rounded-md border px-4 py-3 text-sm font-bold transition ${
+											selectedMemory === memory
+												? 'border-cyan-600 bg-cyan-600 text-white'
+												: 'border-zinc-300 bg-white text-zinc-800 hover:border-cyan-500'
+										}`}
+									>
+										{memory}
+									</button>
+								{/each}
+							</div>
+						</div>
+
+						<p class="mt-5 text-xs text-zinc-400">
+							Código: {product.sku || product.id.slice(0, 8)}
+						</p>
+
 						<button
-							onclick={addToCart}
-							class="w-full rounded-lg bg-green-600 px-6 py-3 font-medium text-white transition-colors hover:bg-green-700"
-							disabled={product.stock === 0}
+							type="button"
+							onclick={handleBuy}
+							disabled={product.stock <= 0}
+							class="mt-6 flex w-full items-center justify-center rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-zinc-300"
 						>
-							{#if product.stock === 0}
-								Sin Stock
-							{:else}
-								Agregar al Carrito
-							{/if}
+							Consultar por WhatsApp
 						</button>
-					</div>
 
-					<!-- Product Features -->
-					<div class="mt-8 border-t pt-8">
-						<h3 class="text-lg font-medium text-gray-900">Características</h3>
-						<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-							<div class="flex items-center">
-								<svg class="mr-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fill-rule="evenodd"
-										d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								<span class="text-sm text-gray-600">Envío rápido</span>
-							</div>
-							<div class="flex items-center">
-								<svg class="mr-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fill-rule="evenodd"
-										d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								<span class="text-sm text-gray-600">Garantía de satisfacción</span>
-							</div>
-							<div class="flex items-center">
-								<svg class="mr-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fill-rule="evenodd"
-										d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								<span class="text-sm text-gray-600">Soporte técnico</span>
-							</div>
-							<div class="flex items-center">
-								<svg class="mr-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fill-rule="evenodd"
-										d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								<span class="text-sm text-gray-600">Pago seguro</span>
-							</div>
+						<div class="mt-5 space-y-4">
+							<button
+								type="button"
+								class="flex w-full items-center justify-between rounded-lg border border-zinc-300 bg-white px-4 py-3 text-left transition hover:border-cyan-500"
+							>
+								<span class="flex items-center gap-4">
+									<span class="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100">
+										<CreditCard size={22} />
+									</span>
+									<span class="text-lg text-zinc-700">Medios de pago</span>
+								</span>
+
+								<ChevronRight size={24} />
+							</button>
+
+							<button
+								type="button"
+								class="flex w-full items-center justify-between rounded-lg border border-zinc-300 bg-white px-4 py-3 text-left transition hover:border-cyan-500"
+							>
+								<span class="flex items-center gap-4">
+									<span class="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100">
+										<Home size={22} />
+									</span>
+									<span>
+										<span class="block text-lg text-zinc-700">Envío a domicilio</span>
+										<span class="block text-xs text-emerald-600">Siempre disponible</span>
+									</span>
+								</span>
+
+								<ChevronRight size={24} />
+							</button>
+
+							<button
+								type="button"
+								class="flex w-full items-center justify-between rounded-lg border border-zinc-300 bg-white px-4 py-3 text-left transition hover:border-cyan-500"
+							>
+								<span class="flex items-center gap-4">
+									<span class="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100">
+										<Store size={22} />
+									</span>
+									<span>
+										<span class="block text-lg text-zinc-700">Retiro en sucursal</span>
+										<span class="block text-xs text-orange-500">Sujeto a disponibilidad de stock</span>
+									</span>
+								</span>
+
+								<ChevronRight size={24} />
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<!-- Related Products -->
-			{#if relatedProducts.length > 0}
-				<div class="mt-16">
-					<h2 class="text-2xl font-bold text-gray-900">Productos Relacionados</h2>
-					<div class="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-						{#each relatedProducts as relatedProduct (relatedProduct.id)}
-							<div
-								class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
-							>
-								<div class="aspect-w-1 aspect-h-1 bg-gray-200">
-									{#if relatedProduct.imageUrl}
-										<img
-											src={relatedProduct.imageUrl}
-											alt={relatedProduct.name}
-											class="h-48 w-full object-cover"
-										/>
-									{:else}
-										<div class="flex h-48 w-full items-center justify-center bg-gray-200">
-											<svg
-												class="h-12 w-12 text-gray-400"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-												></path>
-											</svg>
-										</div>
-									{/if}
-								</div>
-								<div class="p-4">
-									<h3 class="text-lg font-medium text-gray-900">{relatedProduct.name}</h3>
-									<p class="text-sm text-gray-500">
-										{relatedProduct.category?.name || 'Sin categoría'}
-									</p>
-									<div class="mt-2 flex items-center justify-between">
-										<span class="text-xl font-bold text-green-600"
-											>{formatCurrency(relatedProduct.price)}</span
-										>
-									</div>
-									<button
-										onclick={() => cart.addItem(relatedProduct.id)}
-										class="mt-3 w-full rounded-lg bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
-									>
-										Agregar al Carrito
-									</button>
-								</div>
-							</div>
-						{/each}
-					</div>
+		{:else}
+			<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+				<div class="text-center">
+					<h1 class="text-2xl font-bold text-gray-900">Producto no encontrado</h1>
+					<p class="mt-4 text-gray-600">El producto que buscas no existe o no está disponible.</p>
+					<a href="/products" class="mt-6 inline-block text-green-600 hover:text-green-700">
+						← Volver a productos
+					</a>
 				</div>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
-{:else}
-	<div class="flex min-h-screen items-center justify-center bg-gray-50">
-		<div class="text-center">
-			<h1 class="text-2xl font-bold text-gray-900">Producto no encontrado</h1>
-			<p class="mt-2 text-gray-600">El producto que buscas no está disponible.</p>
-			<a
-				href={resolve('/')}
-				class="mt-4 inline-flex items-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-			>
-				Volver al inicio
-			</a>
-		</div>
-	</div>
-{/if}
+</section>

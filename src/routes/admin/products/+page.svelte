@@ -568,10 +568,9 @@
 									<td class="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
 										<div class="flex justify-end space-x-2">
 											<a
-												href="/admin/products/{product.id}/edit"
+												href="/admin/products/{product.slug}/edit"
 												class="text-green-600 transition-colors hover:text-green-900"
 												title="Editar producto"
-												rel="external"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
