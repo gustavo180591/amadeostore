@@ -29,7 +29,7 @@
 			</h2>
 
 			<a
-				href="/products"
+				href="/catalog"
 				class="inline-flex items-center gap-2 text-lg text-zinc-700 transition hover:text-zinc-950"
 			>
 				Ver catálogo completo
@@ -45,7 +45,7 @@
 
 		<div class="mt-8 flex justify-center">
 			<a
-				href="/products"
+				href="/catalog"
 				class="inline-flex min-w-[260px] items-center justify-center rounded-full border-2 border-cyan-600 px-8 py-3 text-lg font-medium text-cyan-700 transition hover:bg-cyan-600 hover:text-white"
 			>
 				Ver catálogo completo

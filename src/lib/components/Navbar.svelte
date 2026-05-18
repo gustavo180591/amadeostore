@@ -13,9 +13,7 @@
 	// Navigation items
 	const navItems = [
 		{ name: 'Inicio', href: '/' },
-		{ name: 'Productos', href: '/products' },
-		{ name: 'Catálogo', href: '/catalog' },
-		{ name: 'Admin', href: '/admin' }
+		{ name: 'Catálogo', href: '/catalog' }
 	];
 
 	// Toggle mobile menu
@@ -125,14 +123,7 @@
 					{/if}
 				</button>
 
-				<!-- Admin Link -->
-				<a
-					href={resolve('/admin')}
-					class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700"
-				>
-					Admin
-				</a>
-			</div>
+				</div>
 
 			<!-- Mobile menu button -->
 			<div class="flex items-center md:hidden">
@@ -186,17 +177,11 @@
 					>
 						Mi Cuenta
 					</a>
-					<button
-						onclick={toggleCart}
+					<a
+						href={resolve('/cart')}
 						class="block w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
 					>
 						Carrito ({cartItemCount})
-					</button>
-					<a
-						href={resolve('/admin')}
-						class="block bg-blue-600 px-3 py-2 text-base font-medium text-white hover:bg-blue-700"
-					>
-						Admin
 					</a>
 				</div>
 			</div>

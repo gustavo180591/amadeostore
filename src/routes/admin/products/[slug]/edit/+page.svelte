@@ -14,12 +14,17 @@
 		name: '',
 		description: '',
 		price: '',
+		oldPrice: '',
 		stock: '',
 		sku: '',
 		imageUrl: '',
 		categoryId: '',
 		status: 'PUBLISHED',
-		isFeatured: false
+		isFeatured: false,
+		badge: '',
+		promoText: '',
+		brand: '',
+		model: ''
 	});
 
 	// Initialize form data when product changes
@@ -28,13 +33,18 @@
 			formData = {
 				name: product.name,
 				description: product.description || '',
-				price: product.price.toString(),
+				price: (product.price || '').toString(),
+				oldPrice: (product.oldPrice || '').toString(),
 				stock: product.stock.toString(),
 				sku: product.sku || '',
 				imageUrl: product.imageUrl || '',
 				categoryId: product.categoryId || '',
 				status: product.status,
-				isFeatured: product.isFeatured
+				isFeatured: product.isFeatured,
+				badge: product.badge || '',
+				promoText: product.promoText || '',
+				brand: product.brand || '',
+				model: product.model || ''
 			};
 		}
 	});

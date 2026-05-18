@@ -147,14 +147,7 @@
 								>Categorías</a
 							>
 						</li>
-						<li>
-							<a
-								href="/admin"
-								class="text-gray-400 transition-colors hover:text-white"
-								rel="external">Panel Admin</a
-							>
-						</li>
-					</ul>
+											</ul>
 				</div>
 
 				<div>

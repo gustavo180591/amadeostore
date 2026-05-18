@@ -1,130 +1,86 @@
 import { PrismaClient } from '@prisma/client';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { fail } from '@sveltejs/kit';
 
 const prisma = new PrismaClient();
 
-export const load: PageServerLoad = async ({ params, url }) => {
-	const { slug } = params;
-
+export const load: PageServerLoad = async ({ params }) => {
 	try {
-		// Get product by slug with variants
-		const product = await prisma.product.findFirst({
-			where: {
-				slug,
-				status: 'PUBLISHED'
-			},
+		// Find product by slug
+		const productData = await prisma.product.findUnique({
+			where: { slug: params.slug },
 			include: {
-				category: {
-					select: {
-						id: true,
-						name: true,
-						slug: true
-					}
-				},
+				category: true,
 				images: {
-					orderBy: {
-						sortOrder: 'asc'
-					}
+					orderBy: { sortOrder: 'asc' }
 				},
 				variants: {
-					where: {
-						isActive: true
-					},
+					where: { stock: { gt: 0 } },
 					include: {
 						images: {
-							orderBy: {
-								sortOrder: 'asc'
-							}
+							orderBy: { sortOrder: 'asc' }
 						}
 					},
-					orderBy: [
-						{
-							isDefault: 'desc'
-						},
-						{
-							storage: 'asc'
-						},
-						{
-							colorName: 'asc'
-						}
-					]
+					orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }]
 				}
 			}
 		});
 
-		if (!product) {
-			throw error(404, 'Producto no encontrado');
+		if (!productData) {
+			throw fail(404, {
+				message: 'Producto no encontrado'
+			});
 		}
 
-		// Get related products (same category, excluding current product)
-		const relatedProducts = await prisma.product.findMany({
-			where: {
-				categoryId: product.categoryId,
-				id: { not: product.id },
-				status: 'PUBLISHED'
-			},
-			include: {
-				category: {
-					select: {
-						id: true,
-						name: true,
-						slug: true
-					}
-				},
-				images: {
-					orderBy: {
-						sortOrder: 'asc'
-					}
-				}
-			},
-			orderBy: { createdAt: 'desc' },
-			take: 4
-		});
-
-		// Find selected variant from URL params or use default
-		const variantId = url.searchParams.get('variant');
-		
-		const selectedVariant =
-			product.variants?.find((variant: any) => variant.id === variantId) ||
-			product.variants?.find((variant: any) => variant.isDefault) ||
-			product.variants?.[0] ||
-			null;
-
-		// Serialize for JSON compatibility
-		const serializeProduct = (product: any) => ({
-			...product,
-			price: product.price ? Number(product.price) : null,
-			oldPrice: product.oldPrice ? Number(product.oldPrice) : null,
-			variants: product.variants?.map((variant: any) => ({
+		// Serialize product for JSON compatibility
+		const product = {
+			...productData,
+			price: productData.price ? Number(productData.price) : null,
+			oldPrice: productData.oldPrice ? Number(productData.oldPrice) : null,
+			variants: productData.variants.map((variant) => ({
 				...variant,
 				price: Number(variant.price),
 				oldPrice: variant.oldPrice ? Number(variant.oldPrice) : null
-			})) || []
-		});
+			}))
+		};
 
-		const serializeProducts = (products: any[]) => {
-			return products.map((product: any) => ({
-				...product,
-				price: Number(product.price)
+		// Get related products (same category, excluding current)
+		let relatedProducts: Array<Record<string, any>> = [];
+		if (product.categoryId) {
+			const relatedProductsData = await prisma.product.findMany({
+				where: {
+					categoryId: product.categoryId,
+					id: { not: product.id },
+					status: 'PUBLISHED',
+					stock: { gt: 0 }
+				},
+				include: {
+					category: true,
+					images: {
+						where: { isPrimary: true },
+						take: 1,
+						orderBy: { sortOrder: 'asc' }
+					}
+				},
+				orderBy: { createdAt: 'desc' },
+				take: 4
+			});
+
+			relatedProducts = relatedProductsData.map((p) => ({
+				...p,
+				price: p.price ? Number(p.price) : null,
+				oldPrice: p.oldPrice ? Number(p.oldPrice) : null
 			}));
-		};
-
-		return {
-			product: serializeProduct(product),
-			selectedVariant: selectedVariant ? {
-				...selectedVariant,
-				price: Number(selectedVariant.price),
-				oldPrice: selectedVariant.oldPrice ? Number(selectedVariant.oldPrice) : null
-			} : null,
-			relatedProducts: serializeProducts(relatedProducts)
-		};
-	} catch (err) {
-		if (err instanceof Error && err.message.includes('not found')) {
-			throw err;
 		}
 
-		console.error('Error loading product:', err);
-		throw error(500, 'Error loading product');
+		return {
+			product,
+			relatedProducts
+		};
+	} catch (error) {
+		console.error('Error loading product:', error);
+		throw fail(500, {
+			message: 'Error al cargar el producto'
+		});
 	}
 };

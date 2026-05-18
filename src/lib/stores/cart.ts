@@ -37,7 +37,12 @@ function createCartStore() {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
 			if (stored) {
-				return JSON.parse(stored);
+				const parsedCart = JSON.parse(stored);
+				// Always start with cart closed, regardless of stored state
+				return {
+					...parsedCart,
+					isOpen: false
+				};
 			}
 		} catch (error) {
 			console.error('Error loading cart from localStorage:', error);
@@ -53,11 +58,15 @@ function createCartStore() {
 
 	const { subscribe, set, update } = writable<CartState>(getInitialCart());
 
-	// Save to localStorage whenever cart changes
+	// Save to localStorage whenever cart changes (but not the isOpen state)
 	const saveToStorage = (cart: CartState) => {
 		if (browser) {
 			try {
-				localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+				const cartToSave = {
+					...cart,
+					isOpen: false // Never save the open state
+				};
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(cartToSave));
 			} catch (error) {
 				console.error('Error saving cart to localStorage:', error);
 			}

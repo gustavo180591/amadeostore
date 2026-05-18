@@ -12,6 +12,17 @@ export async function load({ params }) {
 				category: true,
 				images: {
 					orderBy: { sortOrder: 'asc' }
+				},
+				variants: {
+					include: {
+						images: {
+							orderBy: { sortOrder: 'asc' }
+						}
+					},
+					orderBy: [
+						{ isDefault: 'desc' },
+						{ createdAt: 'asc' }
+					]
 				}
 			}
 		});
@@ -24,6 +35,17 @@ export async function load({ params }) {
 					category: true,
 					images: {
 						orderBy: { sortOrder: 'asc' }
+					},
+					variants: {
+						include: {
+							images: {
+								orderBy: { sortOrder: 'asc' }
+							}
+						},
+						orderBy: [
+							{ isDefault: 'desc' },
+							{ createdAt: 'asc' }
+						]
 					}
 				}
 			});
@@ -38,7 +60,13 @@ export async function load({ params }) {
 		// Serialize product for JSON compatibility
 		const product = {
 			...productData,
-			price: Number(productData.price)
+			price: productData.price ? Number(productData.price) : null,
+			oldPrice: productData.oldPrice ? Number(productData.oldPrice) : null,
+			variants: productData.variants.map(variant => ({
+				...variant,
+				price: Number(variant.price),
+				oldPrice: variant.oldPrice ? Number(variant.oldPrice) : null
+			}))
 		};
 
 		// Get all categories for dropdown

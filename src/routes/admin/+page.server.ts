@@ -32,7 +32,8 @@ export const load: PageServerLoad = async () => {
 		// Serialize prices
 		const recentProducts = recentProductsData.map((product) => ({
 			...product,
-			price: Number(product.price)
+			price: product.price ? Number(product.price) : null,
+			oldPrice: product.oldPrice ? Number(product.oldPrice) : null
 		}));
 
 		// Calculate total stock value
