@@ -19,10 +19,7 @@ export async function load({ params }) {
 							orderBy: { sortOrder: 'asc' }
 						}
 					},
-					orderBy: [
-						{ isDefault: 'desc' },
-						{ createdAt: 'asc' }
-					]
+					orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }]
 				}
 			}
 		});
@@ -42,10 +39,7 @@ export async function load({ params }) {
 								orderBy: { sortOrder: 'asc' }
 							}
 						},
-						orderBy: [
-							{ isDefault: 'desc' },
-							{ createdAt: 'asc' }
-						]
+						orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }]
 					}
 				}
 			});
@@ -62,7 +56,7 @@ export async function load({ params }) {
 			...productData,
 			price: productData.price ? Number(productData.price) : null,
 			oldPrice: productData.oldPrice ? Number(productData.oldPrice) : null,
-			variants: productData.variants.map(variant => ({
+			variants: productData.variants.map((variant) => ({
 				...variant,
 				price: Number(variant.price),
 				oldPrice: variant.oldPrice ? Number(variant.oldPrice) : null

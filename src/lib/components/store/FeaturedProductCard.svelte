@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	type FeaturedProduct = {
 		id: string;
 		name: string;
@@ -22,8 +24,6 @@
 			maximumFractionDigits: 0
 		}).format(value);
 
-	const taxFreePrice = $derived(Math.round(product.price / 1.21));
-
 	function badgeClasses(color?: 'orange' | 'pink' | 'blue' | 'green') {
 		switch (color) {
 			case 'pink':
@@ -40,7 +40,7 @@
 </script>
 
 <a
-	href={`/products/${product.slug}`}
+	href={resolve(`/products/${product.slug}`)}
 	class="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
 >
 	<div class="relative flex min-h-[280px] items-center justify-center bg-[#f8f8f8] p-6">
@@ -88,15 +88,5 @@
 				</span>
 			{/if}
 		</div>
-
-		<div class="mt-1 text-xs text-zinc-400 uppercase">
-			PRECIO SIN IMPUESTOS {formatPrice(taxFreePrice)}
-		</div>
-
-		{#if product.promoText}
-			<div class="mt-3 text-sm font-extrabold text-cyan-600 uppercase">
-				{product.promoText}
-			</div>
-		{/if}
 	</div>
 </a>

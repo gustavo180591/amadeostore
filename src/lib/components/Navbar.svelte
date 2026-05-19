@@ -11,10 +11,7 @@
 	const cartItemCount = $derived(cartState.items.reduce((total, item) => total + item.quantity, 0));
 
 	// Navigation items
-	const navItems = [
-		{ name: 'Inicio', href: '/' },
-		{ name: 'Catálogo', href: '/catalog' }
-	];
+	const navItems = [{ name: 'Inicio', href: '/' }];
 
 	// Toggle mobile menu
 	function toggleMobileMenu() {
@@ -72,18 +69,6 @@
 
 			<!-- Desktop Actions -->
 			<div class="hidden items-center space-x-4 md:flex">
-				<!-- Search -->
-				<button class="p-2 text-gray-700 hover:text-blue-600" aria-label="Buscar productos">
-					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-						/>
-					</svg>
-				</button>
-
 				<!-- User Account -->
 				<a
 					href={resolve('/admin')}
@@ -122,8 +107,7 @@
 						</span>
 					{/if}
 				</button>
-
-				</div>
+			</div>
 
 			<!-- Mobile menu button -->
 			<div class="flex items-center md:hidden">

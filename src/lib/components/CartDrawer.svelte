@@ -55,7 +55,9 @@
 	>
 		<!-- Cart Drawer -->
 		<div
-			class="fixed top-0 right-0 h-full w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-in-out {isOpen ? 'translate-x-0' : 'translate-x-full'}"
+			class="fixed top-0 right-0 h-full w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-in-out {isOpen
+				? 'translate-x-0'
+				: 'translate-x-full'}"
 			style="transform: {isOpen ? 'translateX(0)' : 'translateX(100%)'}"
 		>
 			<!-- Header -->

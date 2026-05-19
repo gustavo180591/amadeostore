@@ -32,15 +32,6 @@
 					Descubre productos premium con la mejor calidad del mercado. Envíos rápidos y garantía de
 					satisfacción.
 				</p>
-				<div class="mt-8 flex justify-center space-x-4">
-					<a
-						href="#products"
-						class="inline-flex items-center rounded-lg border border-transparent bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700"
-					>
-						Ver Productos
-					</a>
-					<WhatsAppButton size="lg" text="Consultar por WhatsApp" />
-				</div>
 			</div>
 		</div>
 	</section>
@@ -147,7 +138,7 @@
 								>Categorías</a
 							>
 						</li>
-											</ul>
+					</ul>
 				</div>
 
 				<div>

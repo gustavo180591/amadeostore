@@ -350,9 +350,7 @@
 					</div>
 
 					<div>
-						<label for="badge" class="mb-2 block text-sm font-medium text-gray-700">
-							Badge
-						</label>
+						<label for="badge" class="mb-2 block text-sm font-medium text-gray-700"> Badge </label>
 						<input
 							id="badge"
 							name="badge"

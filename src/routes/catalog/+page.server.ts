@@ -12,7 +12,7 @@ export const load: PageServerLoad = async () => {
 
 	// Get products with variants and images
 	const products = await prisma.product.findMany({
-		where: { 
+		where: {
 			status: 'PUBLISHED',
 			stock: { gt: 0 }
 		},
@@ -36,22 +36,23 @@ export const load: PageServerLoad = async () => {
 				}
 			}
 		},
-		orderBy: [
-			{ isFeatured: 'desc' },
-			{ createdAt: 'desc' }
-		]
+		orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }]
 	});
 
 	// Serialize products and calculate effective pricing
 	const serializedProducts = products.map((product) => {
 		const primaryImage = product.images[0];
 		const defaultVariant = product.variants[0];
-		
+
 		// Use variant price if available, otherwise product price
 		const effectivePrice = defaultVariant ? Number(defaultVariant.price) : Number(product.price);
-		const effectiveOldPrice = defaultVariant?.oldPrice ? Number(defaultVariant.oldPrice) : (product.oldPrice ? Number(product.oldPrice) : null);
+		const effectiveOldPrice = defaultVariant?.oldPrice
+			? Number(defaultVariant.oldPrice)
+			: product.oldPrice
+				? Number(product.oldPrice)
+				: null;
 		const effectiveStock = defaultVariant ? defaultVariant.stock : product.stock;
-		
+
 		return {
 			id: product.id,
 			name: product.name,
@@ -73,13 +74,15 @@ export const load: PageServerLoad = async () => {
 			category: product.category,
 			imageUrl: primaryImage?.url || product.imageUrl,
 			hasVariants: product._count.variants > 1,
-			defaultVariant: defaultVariant ? {
-				id: defaultVariant.id,
-				colorName: defaultVariant.colorName,
-				colorHex: defaultVariant.colorHex,
-				storage: defaultVariant.storage,
-				sku: defaultVariant.sku
-			} : null
+			defaultVariant: defaultVariant
+				? {
+						id: defaultVariant.id,
+						colorName: defaultVariant.colorName,
+						colorHex: defaultVariant.colorHex,
+						storage: defaultVariant.storage,
+						sku: defaultVariant.sku
+					}
+				: null
 		};
 	});
 

@@ -10,25 +10,30 @@ export const STORE_CONFIG = {
 
 export const WHATSAPP_CONFIG = {
 	phone: STORE_CONFIG.whatsapp,
-	generateOrderMessage: (items: Array<{
-		name: string;
-		quantity: number;
-		price: number;
-		variant?: {
-			colorName?: string;
-			storage?: string;
-		};
-	}>, total: number) => {
+	generateOrderMessage: (
+		items: Array<{
+			name: string;
+			quantity: number;
+			price: number;
+			variant?: {
+				colorName?: string;
+				storage?: string;
+			};
+		}>,
+		total: number
+	) => {
 		const storeName = STORE_CONFIG.name;
 		const greeting = `¡Hola! Quiero realizar el siguiente pedido en ${storeName}:`;
-		
-		const itemsList = items.map(item => {
-			const variantInfo = item.variant 
-				? ` (${item.variant.colorName}${item.variant.storage ? ` - ${item.variant.storage}` : ''})`
-				: '';
-			
-			return `• ${item.name}${variantInfo} x${item.quantity} - $${(item.price * item.quantity).toLocaleString('es-AR')}`;
-		}).join('\n');
+
+		const itemsList = items
+			.map((item) => {
+				const variantInfo = item.variant
+					? ` (${item.variant.colorName}${item.variant.storage ? ` - ${item.variant.storage}` : ''})`
+					: '';
+
+				return `• ${item.name}${variantInfo} x${item.quantity} - $${(item.price * item.quantity).toLocaleString('es-AR')}`;
+			})
+			.join('\n');
 
 		const totalFormatted = `Total: $${total.toLocaleString('es-AR')}`;
 		const closing = '\n\n¿Podrían confirmarme la disponibilidad y el tiempo de entrega? ¡Gracias!';

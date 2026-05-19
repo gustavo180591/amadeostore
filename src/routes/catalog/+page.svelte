@@ -55,12 +55,13 @@
 		// Search filter
 		if (searchQuery) {
 			const query = searchQuery.toLowerCase();
-			filtered = filtered.filter((product) =>
-				product.name.toLowerCase().includes(query) ||
-				product.description?.toLowerCase().includes(query) ||
-				product.brand?.toLowerCase().includes(query) ||
-				product.model?.toLowerCase().includes(query) ||
-				product.category?.name.toLowerCase().includes(query)
+			filtered = filtered.filter(
+				(product) =>
+					product.name.toLowerCase().includes(query) ||
+					product.description?.toLowerCase().includes(query) ||
+					product.brand?.toLowerCase().includes(query) ||
+					product.model?.toLowerCase().includes(query) ||
+					product.category?.name.toLowerCase().includes(query)
 			);
 		}
 
@@ -75,8 +76,8 @@
 		}
 
 		// Price range filter
-		filtered = filtered.filter((product) => 
-			product.price >= priceRange[0] && product.price <= priceRange[1]
+		filtered = filtered.filter(
+			(product) => product.price >= priceRange[0] && product.price <= priceRange[1]
 		);
 
 		// Sort
@@ -102,8 +103,12 @@
 	});
 
 	// Price range bounds
-	let minPrice = $derived(() => data.products?.length ? Math.min(...data.products.map(p => p.price)) : 0);
-	let maxPrice = $derived(() => data.products?.length ? Math.max(...data.products.map(p => p.price)) : 1000000);
+	let minPrice = $derived(() =>
+		data.products?.length ? Math.min(...data.products.map((p) => p.price)) : 0
+	);
+	let maxPrice = $derived(() =>
+		data.products?.length ? Math.max(...data.products.map((p) => p.price)) : 1000000
+	);
 
 	// Initialize price range
 	$effect(() => {
@@ -151,9 +156,14 @@
 					bind:value={searchQuery}
 					class="w-full rounded-lg border border-gray-300 px-4 py-3 pl-10 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 				/>
-				<div class="absolute left-3 top-3.5 text-gray-400">
+				<div class="absolute top-3.5 left-3 text-gray-400">
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
 					</svg>
 				</div>
 			</div>
@@ -163,7 +173,10 @@
 				<!-- Sort -->
 				<div>
 					<label class="mb-2 block text-sm font-medium text-gray-700">Ordenar por</label>
-					<select bind:value={sortBy} class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+					<select
+						bind:value={sortBy}
+						class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+					>
 						<option value="featured">Destacados</option>
 						<option value="price-low">Precio: Menor a Mayor</option>
 						<option value="price-high">Precio: Mayor a Menor</option>
@@ -248,7 +261,7 @@
 						Todos ({data.products?.length || 0})
 					</button>
 					{#each data.categories as category (category.id)}
-						{@const count = data.products?.filter(p => p.categoryId === category.id).length || 0}
+						{@const count = data.products?.filter((p) => p.categoryId === category.id).length || 0}
 						{#if count > 0}
 							<button
 								class="rounded-full px-4 py-2 text-sm font-medium transition-colors"
@@ -270,7 +283,8 @@
 		<!-- Results Summary -->
 		<div class="mb-6 flex items-center justify-between">
 			<p class="text-gray-600">
-				Mostrando <span class="font-semibold">{filteredProducts().length}</span> de <span class="font-semibold">{data.totalProducts || 0}</span> productos
+				Mostrando <span class="font-semibold">{filteredProducts().length}</span> de
+				<span class="font-semibold">{data.totalProducts || 0}</span> productos
 			</p>
 			{#if searchQuery || selectedCategory || sortBy !== 'featured' || priceRange[0] > minPrice || priceRange[1] < maxPrice || !inStockOnly}
 				<button
@@ -292,7 +306,7 @@
 		<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each filteredProducts() as product (product.id)}
 				<div
-					class="group overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl hover:-translate-y-1"
+					class="group overflow-hidden rounded-lg bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl"
 				>
 					<!-- Product Image -->
 					<div class="relative">
@@ -300,8 +314,18 @@
 							<img src={product.imageUrl} alt={product.name} class="h-48 w-full object-cover" />
 						{:else}
 							<div class="flex h-48 w-full items-center justify-center bg-gray-200">
-								<svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								<svg
+									class="h-12 w-12 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/>
 								</svg>
 							</div>
 						{/if}
@@ -310,10 +334,15 @@
 						{#if product.isFeatured || product.badge}
 							<div class="absolute top-2 left-2 flex gap-1">
 								{#if product.isFeatured}
-									<span class="rounded-full bg-yellow-400 px-2 py-1 text-xs font-medium text-yellow-900">⭐ Destacado</span>
+									<span
+										class="rounded-full bg-yellow-400 px-2 py-1 text-xs font-medium text-yellow-900"
+										>⭐ Destacado</span
+									>
 								{/if}
 								{#if product.badge}
-									<span class="rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white">{product.badge}</span>
+									<span class="rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white"
+										>{product.badge}</span
+									>
 								{/if}
 							</div>
 						{/if}
@@ -321,7 +350,9 @@
 						<!-- Variants Indicator -->
 						{#if product.hasVariants}
 							<div class="absolute top-2 right-2">
-								<span class="rounded-full bg-gray-800 px-2 py-1 text-xs font-medium text-white">{product.defaultVariant?.colorName || 'Múltiples opciones'}</span>
+								<span class="rounded-full bg-gray-800 px-2 py-1 text-xs font-medium text-white"
+									>{product.defaultVariant?.colorName || 'Múltiples opciones'}</span
+								>
 							</div>
 						{/if}
 					</div>
@@ -330,20 +361,25 @@
 					<div class="p-4">
 						<!-- Category Badge -->
 						{#if product.category}
-							<span class="mb-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+							<span
+								class="mb-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+							>
 								{product.category.name}
 							</span>
 						{/if}
 
 						<!-- Product Name -->
-						<h3 class="mb-1 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+						<h3
+							class="mb-1 text-lg font-semibold text-gray-900 transition-colors group-hover:text-blue-600"
+						>
 							{product.name}
 						</h3>
 
 						<!-- Brand/Model -->
 						{#if product.brand || product.model}
 							<p class="mb-2 text-sm text-gray-500">
-								{product.brand} {product.model}
+								{product.brand}
+								{product.model}
 							</p>
 						{/if}
 
@@ -358,7 +394,10 @@
 								{#if product.defaultVariant.colorName}
 									<span class="flex items-center gap-1">
 										{#if product.defaultVariant.colorHex}
-											<span class="inline-block h-3 w-3 rounded-full border border-gray-300" style={`background-color: ${product.defaultVariant.colorHex}`}></span>
+											<span
+												class="inline-block h-3 w-3 rounded-full border border-gray-300"
+												style={`background-color: ${product.defaultVariant.colorHex}`}
+											></span>
 										{/if}
 										{product.defaultVariant.colorName}
 									</span>
@@ -374,7 +413,9 @@
 							<div class="flex items-center gap-2">
 								<span class="text-2xl font-bold text-gray-900">{formatPrice(product.price)}</span>
 								{#if product.oldPrice && product.oldPrice > product.price}
-									<span class="text-sm text-gray-500 line-through">{formatPrice(product.oldPrice)}</span>
+									<span class="text-sm text-gray-500 line-through"
+										>{formatPrice(product.oldPrice)}</span
+									>
 									<span class="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-700">
 										-{Math.round((1 - product.price / product.oldPrice) * 100)}%
 									</span>
@@ -401,14 +442,16 @@
 						<div class="space-y-2">
 							<button
 								onclick={() => goto(resolve(`/products/${product.slug}`))}
-								class="block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-white transition-colors hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+								class="block w-full rounded-md bg-blue-600 px-4 py-2 text-center text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
 								disabled={product.stock <= 0}
 							>
 								{product.stock > 0 ? 'Ver Detalles' : 'Sin Stock'}
 							</button>
 							{#if product.hasVariants}
 								<p class="text-center text-xs text-gray-500">
-									{product.defaultVariant ? '1 variante seleccionada' : 'Múltiples variantes disponibles'}
+									{product.defaultVariant
+										? '1 variante seleccionada'
+										: 'Múltiples variantes disponibles'}
 								</p>
 							{/if}
 						</div>
@@ -419,8 +462,18 @@
 
 		{#if filteredProducts().length === 0}
 			<div class="py-12 text-center">
-				<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+				<svg
+					class="mx-auto h-12 w-12 text-gray-400"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
 				</svg>
 				<h3 class="mt-4 text-lg font-medium text-gray-900">No se encontraron productos</h3>
 				<p class="mt-2 text-gray-500">
