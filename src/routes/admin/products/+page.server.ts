@@ -42,7 +42,8 @@ export async function load() {
 		// Serialize prices for JSON compatibility
 		const products = productsData.map((product) => ({
 			...product,
-			price: Number(product.price)
+			price: Number(product.price),
+			oldPrice: product.oldPrice ? Number(product.oldPrice) : null
 		}));
 
 		// Get all categories for filters
